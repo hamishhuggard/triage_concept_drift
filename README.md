@@ -2,64 +2,68 @@
 
 Code produced by Hamish Huggard for his Master's Degree in computer science at UoA.
 
+Reproduce the Conda environment I used with
+```
+conda env create -f=env.yml
+```
+
+### Conda cheatsheet
+
+This is for my own benefit.
+
+What is conda?
+ * conda = virtualenv + pip
+ * If you have conda you don't need virtualenv, but you still need docker
+
+Create an environment with
+```conda create --name <envname> python=<version> <optional dependencies>
+```
+And then remove it with
+```
+conda remove --name <envname> --all
+```
+Instal packages with
+```
+(envname)> conda install <package>
+```
+or
+```
+(envname)> pip install <package>
+```
+See a list of all packages with
+```
+conda list
+```
+Update the environment yaml with
+```
+conda env export > env.yml
+```
+Restore environment with
+```
+conda env create -f=env.yml
+```
+To use a conda environment in jupyter notebooks/labs, first install `nb_conda_kernels` in the base environment
+```
+(base)$ conda install -c conda-forge nb_conda_kernels
+```
+Then install `ipykernel` in the target environment
+```
+$ conda activate cenv
+(cenv)$ conda install ipykernel
+(cenv)$ conda deactivate
+```
+
 ## Experiments
 
-
+A bunch of notebooks and csvs which record the outcomes of experiments.
 
 ## Dash App
 
-
+A GUI for interacting with concept drift detection systems built using Dash.
 
 ## MediTornado
 
 A fork of the Tornado framework with the following additions:
  * An implementation of the CDDM algorithm
  * Data stream generators for medical data based on the MIMIC-III dataset
- *
-
-
-conda = virtualenv + pip
-if you have conda you don't need virtualenv, but you still need docker
-
-> conda create --name <envname> python=<version> <optional dependencies>
-
-> conda remove --name <envname> --all
-
-(envname)> conda install <package>
-
-(envname)> pip install <package>
-
-Jupyter
-
-In addition, installing ipykernel in an environment adds a new listing in the Kernels dropdown menu of Jupyter notebooks, extending reproducible environments to notebooks. As of Anaconda 4.1, nbextensions were added, adding extensions to notebooks more easily.
-
-Reliability
-
-In my experience, conda is faster and more reliable at installing large libraries such as numpy and pandas. Moreover, if you wish to transfer your the preserved state of an environment, you can do so by sharing or cloning an env.
-
-conda list
-gives all installed packages
-
-REPRODUCING ENVIRONMENT
-
-conda env create -f=env.yml
-
-When you make changes to your environment, run an export before you add/commit:
-
-conda env export > env.yml
-
-
-
-Using conda environment in jupyter labs/notebook
-
-https://stackoverflow.com/questions/53004311/how-to-add-conda-environment-to-jupyter-lab
-
-A solution using nb_conda_kernels. First, install it in your base environment :
-
-(base)$ conda install -c conda-forge nb_conda_kernels
-Then in order to get a kernel for the conda_env cenv :
-
-$ conda activate cenv
-(cenv)$ conda install ipykernel
-(cenv)$ conda deactivate
-You will get a new kernel named Python [conda env:cenv] in your next run of jupyter lab / jupyter notebook
+Note that this is a git [submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) with its own repository.
