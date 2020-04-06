@@ -197,14 +197,12 @@ class StreamReader:
      * labels.csv
         * only one column giving the true labels
 
-    TODO: arff may be better than CSV. Maybe make both compatable?
-
     StreamReader extracts the data from each of these csvs and creates DataStream objects.
     Within the DataStream constructor, drift statuses will be calculated.
     '''
 
     def __init__(self, title=''):
-        self.dirname = os.path.abspath(f'../experiments/data_streams/new_concept')
+        self.dirname = os.path.abspath(f'../Tornado/data_streams/new_concept')
 
     def parse_cat_datastream(self, stream):
         # get unique values
@@ -233,6 +231,16 @@ class StreamReader:
         ds =  DataStream(x=np.arange(len(errs)), y=errs, title='Error Rate', status=status)
         return ds
 
+class StreamReader(CallBackLogic, html.Div):
+
+    def __init__(self, title=''):
+
+        dropdown_opts = [ {'label': i, 'value': i} for i in Smoother.SMOOTH_SHAPES ]
+        self.dropdown = DropDownItem(options=dropdown_opts, value='hanning')
+
+        CallBackLogic.__init__(self)
+        html.Div.__init__(self, [html.H5(title), self.slider])
+        self.connect_input(self.slider)
 
 # def load_scenario(i):
 #     # path = os.path.abspath(f'./fake_data/scenario{i}.csv')
