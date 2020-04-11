@@ -16,7 +16,7 @@ class BOWMachine:
     There is also a static method for converting BOWs from dataframes to arff files.
     '''
 
-    def __init__(self, vocab_text):
+    def __init__(self):
 
         self.vocab = None
 
