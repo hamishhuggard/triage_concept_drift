@@ -3,24 +3,6 @@ import random
 from sklearn.tree import DecisionTreeClassifier
 from numpy.random import randint
 
-class MimicDataWrapper:
-
-    '''
-    This wraps the MIMIC-III data and spawns the machine readable
-    '''
-
-    def __init__(self, path_to_csv):
-        self.data = pd.read_csv(path_to_csv)
-
-    def get_full_feature_stream(self):
-        return self.data
-
-    def get_mimic_feature_stream(self):
-        pass
-
-    def get_data_shuffle(self, n):
-        return self.sample(n)
-
 class MIMIC:
 
     '''
@@ -28,6 +10,14 @@ class MIMIC:
     contains a synthetic concept.
     '''
 
+    MIMIC_DATA = None
+
+    @staticmethod
+    def get_mimic_data():
+        # Load MIMIC data if it hasn't been already.
+        if MIMIC.MIMIC_DATA == None:
+            MIMIC.MIMIC_DATA = pd.read_csv(path_to_csv)
+        return MIMIC.MIMIC_DATA
 
     def __init__(self, concept_length=20000, transition_length=50,
         noise_rate=0.1, n_priorities=4, random_seed=None):
@@ -59,11 +49,7 @@ class MIMIC:
         random.seed(self.__RANDOM_SEED)
 
         # [1] CREATING RECORDS
-        for i in range(0, self.__INSTANCES_NUM):
-            concept_sec = int(i / self.__CONCEPT_LENGTH)
-            dist_id = int(concept_sec % 2)
-            record = self.create_record(dist_id)
-            self.__RECORDS.append(list(record))
+        self.__RECORDS = MIMIC.get_mimic_data().sample(self.__INSTANCES_NUM)
 
         # [2] TRANSITION
         for i in range(1, self.__NUM_DRIFTS + 1):
