@@ -89,7 +89,7 @@ class MIMIC:
     def create_record(self, i, dist_id):
         # i is the index of the instance in the features_df
         # dist_id is the concept index
-        features = features_df.iloc[i, :]
+        features = self.__FEATURES_DF.iloc[i, :]
         concept = self.__CONCEPTS[dist_id]
         label = concept.predict(features)
         return features + [label]
@@ -103,15 +103,15 @@ class MIMIC:
 
     def write_to_arff(self, output_path):
         arff_writer = open(output_path, "w")
-        arff_writer.write("@relation MIMIC" + "\n")
-        arff_writer.write("@attribute x real" + "\n" +
-                          "@attribute y real" + "\n" +
-                          "@attribute class {p,n}" + "\n\n")
+        arff_writer.write("@relation MIMIC\n")
+        for col in self.__FEATURES_DF.columns:
+            arff_writer.write(f"@attribute {col} real \n")
+        classes_string = ','.join(str(i+1) for i in range(self.__N_PRIORITIES))
+        arff_writer.write(f"@attribute priority {classes_string} real \n\n")
         arff_writer.write("@data" + "\n")
-        for i in range(0, len(self.__RECORDS)):
-            arff_writer.write(str("%0.3f" % self.__RECORDS[i][0]) + "," +
-                              str("%0.3f" % self.__RECORDS[i][1]) + "," +
-                              self.__RECORDS[i][2] + "\n")
+        for record in self.__RECORDS:
+            line_str = ",".join(str(i) for i in record)
+            arff_writer.write(line_str + "\n")
         arff_writer.close()
         print("You can find the generated files in " + output_path + "!")
 
