@@ -16,6 +16,7 @@ class MedTextDetector:
         self.label_detectors = {}
         self.cdrift_detector = None
         self.virt_drift_detector = None
+        self.id_list = []
 
     def train(self, train_data):
         self.bm.convert_train_data(strings)
@@ -26,6 +27,7 @@ class MedTextDetector:
             self.label_detectors[col].do_something()
 
     def add_label(self, label, instance_id):
+
         pass
 
     def add_prediction(self, label, instance_id):
