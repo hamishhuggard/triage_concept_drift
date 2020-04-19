@@ -116,6 +116,23 @@ class MIMIC:
         print("You can find the generated files in " + output_path + "!")
 
 
-class MIMIC_FEATURE_DRIFT:
+class MIMIC_NEGATE(MIMIC):
+
+    def __init__(self, concept_length=20000, transition_length=50,
+        noise_rate=0.1, n_priorities=4, negate_n=None, n_concepts=5, random_seed=None)
+
+        self.negate_n = negate_n # default conditino 10% of features
+
+        super().__init__(concept_length=20000, transition_length=50,
+            noise_rate=0.1, n_priorities=4, n_concepts=5, random_seed=None)
+
+    def generate(self):
+        pass
+
+class MIMIC_UNDERSAMPLE(MIMIC):
+    def __init__(self):
+        pass
+
+class MIMIC_OVERSAMPLE(MIMIC):
     def __init__(self):
         pass
