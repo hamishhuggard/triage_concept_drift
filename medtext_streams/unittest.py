@@ -14,5 +14,8 @@ class TestMedTextStuff(unittest.TestCase):
     def test_bow_machine(self):
         pass
 
+    def test_medtext_detector(self):
+        pass
+
 if __name__ == '__main__':
     unittest.main()
