@@ -26,6 +26,9 @@ class MedTextDetector:
         self.concept_dd = concept_dd
         self.real_dd = real_dd
 
+        self.labels = []
+        self.predictions = []
+
         # self.concept_detector = None
         # self.virt_drift_detector = None
 
@@ -62,14 +65,31 @@ class MedTextDetector:
         for col in instance_data.columns:
             self.label_detectors[col].do_something()
 
+    def detect_drift(self, detector, val, prob=None):
+        if prob:
+            warning_status, drift_status = detector.detect(val, prob)
+        else:
+            warning_status, drift_status = detector.detect(val)
+        return warning_status, drift_status
+
+    def detect_concept_drift(self, i):
+        label_i = self.labels[i]
+        prediction_i = self.predictions[i]
+        prediction_status = label_i == predictino_i
+        return self.detect_drift(self.concept_dd, prediction_status)
+
     def add_label(self, label, instance_ts=None):
 
         # if instance_ts == None:
         #     instance_ts = self.label_ts_list[-1]+1
 
+        detector.detect(prediction_status)
+        i = len(self.labels)
+        self.detect_concept_drift()
+
         pass
 
-    def add_prediction(self, label, instance_ts=None):
+    def add_prediction(self, label, prob, instance_ts=None):
 
         # if instance_ts == None:
         #     instance_ts = self.prediction_ts_list[-1]+1
