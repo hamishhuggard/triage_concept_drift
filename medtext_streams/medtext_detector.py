@@ -17,11 +17,13 @@ class MedTextDetector:
 
         self.bm = BOWMachine()
 
+        self.label_set = label_set
+
         self.feature_dd = feature_dd
         self.label_dd = label_dd
 
         self.feature_dd_dict = {}
-        self.label_dd_dict = {}
+        self.label_dd_dict = { i:feature_dd() for i in label_set }
 
         self.concept_dd = concept_dd
         self.real_dd = real_dd
@@ -51,9 +53,14 @@ class MedTextDetector:
             self.feature_dd_dict[feature] = this_feature_dd
 
     def add_training_label(self, training_labels):
-        pass
+        for label_i in training_label:
+            for label in self.label_set:
+                outcome = label_i == label
+                detector = self.label_dd_dict[label_i]
+                self.detect_drift(detector, outcome)
 
     def add_training_predictions(self, training_predictions):
+        
         pass
 
     def add_instance(self, instance, instance_ts=None):

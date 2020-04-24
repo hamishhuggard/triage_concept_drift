@@ -15,7 +15,10 @@ class TestMedTextStuff(unittest.TestCase):
         pass
 
     def test_medtext_detector(self):
-        pass
+        mtd = MedTextDetector()
+        mtd.add_training_docs()
+        mtd.add_training_label()
+        mtd.add_training_predictions()
 
 if __name__ == '__main__':
     unittest.main()
