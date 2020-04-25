@@ -19,11 +19,16 @@ class MedTextDetector:
 
         self.label_set = label_set
 
-        self.feature_dd = feature_dd
         self.label_dd = label_dd
-
-        self.feature_dd_dict = {}
         self.label_dd_dict = { i:feature_dd() for i in label_set }
+        self.labels = []
+        self.label_val_dict = { i:[] for i in label_set }
+        self.label_state_dict = { i:[] for i in label_set }
+
+        self.feature_dd = feature_dd
+        self.feature_dd_dict = {}
+        self.feature_vals = {}
+
 
         self.concept_dd = concept_dd
         self.real_dd = real_dd
@@ -59,8 +64,16 @@ class MedTextDetector:
                 detector = self.label_dd_dict[label_i]
                 self.detect_drift(detector, outcome)
 
+
+    def add_label_prediction(self, prediction_dict, prediction):
+
+        for label in self.label_set:
+            outcome = label_i == label
+            detector = label_dict[label_i]
+            self.detect_drift(detector, outcome)
+
     def add_training_predictions(self, training_predictions):
-        
+
         pass
 
     def add_instance(self, instance, instance_ts=None):
