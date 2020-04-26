@@ -3,6 +3,47 @@ from Tornado import DDM
 from cddm import CDDM
 import unittest
 
+class DataStream:
+
+    def __init__(self, name, detector):
+        self.detector = detector
+        self.values = []
+        self.statuses = []
+
+    def add_value(self, value, confidence=None, warmup=False):
+        '''
+        Update this datastream with a new value.
+        Args:
+        - value: the value to be added
+        - confidence: in case this is a prediction stream and CDDM is the
+            drift detector, this is the confidence of the model.
+        - warmup: whether or not this value is being added in the warmup period.
+            If not, then no drift status will be calculated.
+            TODO: do I need this?
+        '''
+
+        if prob: # for CDDM
+            warning_status, drift_status = self.detector.detect(value, prob)
+        else:
+            warning_status, drift_status = self.detector.detect(value)
+
+        status = 'Normal'
+        if warning_status:
+            status = 'Warning'
+            self.send_warning_signal()
+        if drift_status:
+            status = 'Drift'
+            self.send_drift_signal()
+
+        self.values.append(value)
+        self.statuses.append(status)
+
+    def send_warning_signal(self):
+        print('Drift warning in', self.name)
+
+    def send_drift_signal(self):
+        print('Drift detected in', self.name)
+
 class MedTextDetector:
 
     def __init__(
@@ -19,22 +60,25 @@ class MedTextDetector:
 
         self.label_set = label_set
 
-        self.label_dd = label_dd
+        self.label_stream_dict = { i:DataStream('Label={i}', label_dd) for i in label_set }
+        self.prediction_stream_dict = { i:DataStream() for i in label_set }
+
         self.label_dd_dict = { i:feature_dd() for i in label_set }
         self.labels = []
         self.label_val_dict = { i:[] for i in label_set }
         self.label_state_dict = { i:[] for i in label_set }
 
+        self.prediction_dd_dict = { i:feature_dd() for i in label_set }
+        self.predictions = []
+        self.prediction_val_dict = { i:[] for i in label_set }
+        self.prediction_state_dict = { i:[] for i in label_set }
+
         self.feature_dd = feature_dd
         self.feature_dd_dict = {}
         self.feature_vals = {}
 
-
         self.concept_dd = concept_dd
         self.real_dd = real_dd
-
-        self.labels = []
-        self.predictions = []
 
         # self.concept_detector = None
         # self.virt_drift_detector = None
@@ -65,7 +109,8 @@ class MedTextDetector:
                 self.detect_drift(detector, outcome)
 
 
-    def add_label_prediction(self, prediction_dict, prediction):
+    def add_label_value(self, dd_dict, value_dict, state_dict,
+            value_list, new_label, training_mode=False):
 
         for label in self.label_set:
             outcome = label_i == label
