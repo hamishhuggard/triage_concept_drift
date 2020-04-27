@@ -10,17 +10,24 @@ class DataStream:
         self.detector = detector
         self.values = []
         self.statuses = []
+        self.TRAINING_PERIOD = False
 
-    def add_value(self, value, confidence=None, warmup=False):
+    def set_training_period(self, value):
+        '''
+        If the data stream hasn't loaded all of the training data values, then
+        we should have self.set_training_period(True), and no drift signals will
+        be emitted. When actually observing data online, then we should have
+        self.set_training_period(False).
+        '''
+        self.TRAINING_PERIOD = value
+
+    def add_value(self, value, confidence=None):
         '''
         Update this datastream with a new value.
         Args:
         - value: the value to be added
         - confidence: in case this is a prediction stream and CDDM is the
             drift detector, this is the confidence of the model.
-        - warmup: whether or not this value is being added in the warmup period.
-            If not, then no drift status will be calculated.
-            TODO: do I need this?
         '''
 
         if prob: # for CDDM
@@ -40,10 +47,12 @@ class DataStream:
         self.statuses.append(status)
 
     def send_warning_signal(self):
-        print('Drift warning in', self.name)
+        if self.training_period == False:
+            print('Drift warning in', self.name)
 
     def send_drift_signal(self):
-        print('Drift detected in', self.name)
+        if self.training_period == False:
+            print('Drift detected in', self.name)
 
 
 
@@ -163,11 +172,29 @@ class MedTextDetector:
         train_data = self.bm.convert_train_data(training_docs)
 
         for feature in train_data.columns:
-            this_feature_dd = self.feature_dd(**self.feature_dd_kwargs)
+
+            new_feature_dd = self.feature_dd(**self.feature_dd_kwargs)
+            feature_name = f'Feature: "{feature}"'
+            feature_stream = DataStream(feature_name, new_feature_dd)
+            feature_stream.set_training_period(True)
+
             for i in range(len(train_data)):
                 value = train_data.loc[i, feature]
-                this_feature_dd.update(value)
-            self.feature_dd_dict[feature] = this_feature_dd
+                feature_stream.add_value(value)
+            self.feature_stream_dict[feature] = feature_stream
+
+            feature_stream.set_training_period(False)
 
     def add_doc(self, doc):
-        pass
+
+        doc_data = self.bm.convert_online([doc])
+
+        for feature in doc_data.columns:
+            value = train_data.loc[i, 0]
+            feature_stream = self.feature_stream_dict[feature].add_value(value)
+
+
+'''
+TODO:
+- what happens with training true labels or predictions?
+'''
