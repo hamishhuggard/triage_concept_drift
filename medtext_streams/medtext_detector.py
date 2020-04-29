@@ -54,6 +54,9 @@ class DataStream:
         if self.training_period == False:
             print('Drift detected in', self.name)
 
+    def get_current_status(self):
+        return self.statuses[-1]
+
 
 
 class MedTextDetector:
@@ -194,7 +197,58 @@ class MedTextDetector:
             feature_stream = self.feature_stream_dict[feature].add_value(value)
 
 
+
+    def print_statuses(self):
+        status_str = ''
+
+        # Concept drift
+        drift_status = self.loss_stream.get_current_status()
+        if drift_status == 'Warning':
+            status_str += 'Concept drift warning has been triggered.\n'
+        if drift_status == 'Drift':
+            status_str += 'Concept drift has been detected.\n'
+
+        # Read off the drift statuses from a dictionary of streams
+        def stream_dict_status_str(steam_dict, stream_type):
+
+            status_str = ''
+
+            status_dict = defaultdict([])
+            for key, stream in stream_dict.items():
+                key_status = stream.get_current_status()
+                status_dict[key_status].append(key)
+
+            if len(status_dict['Warning']) > 0:
+                status_str += 'Drift warning has been triggered for '
+                status_str += stream_type
+                status_str += ' with values '
+                status_str += ', '.join(sorted(status_dict['Warning']))
+                status_str += '\n'
+            if len(status_dict['Drift']) > 0:
+                status_str += 'Drift has been detected for '
+                status_str += stream_type
+                status_str += ' with values '
+                status_str += ', '.join(sorted(status_dict['Drift']))
+                status_str += '\n'
+
+            # If string is non-empty, then prettify it
+            if len(status_str) > 0:
+                status_str = stream_type.upper() + '\n' + status_str + '\n'
+
+            return status_str
+
+        # Label drift
+        status_str += stream_dict_status_str(self.true_label_stream_dict, 'true labels')
+        status_str += stream_dict_status_str(self.pred_label_stream_dict, 'predicted labels')
+        status_str += stream_dict_status_str(self.feature_stream_dict, 'features')
+
+        if len(status_str) == 0:
+            status_str = 'No drifts detected.'
+
+        print(status_str)
+
 '''
 TODO:
 - what happens with training true labels or predictions?
+-
 '''
