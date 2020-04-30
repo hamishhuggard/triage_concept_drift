@@ -6,20 +6,39 @@ from collections import defaultdict
 
 class DataStream:
 
+    '''
+    DataStream encapsulates a stream of data, including:
+    - Adding new values to the data stream
+    - Monitoring the stream with a drift detector
+    - Sending warning or drift signals if a drift is detected or suspected
+
+    Data streams may include:
+    - Feature values (for detecting feature drift)
+    - Label values, either predicted labels or true labels (for detecting label drift)
+    - Loss values (for detecting concept drift)
+    '''
+
     def __init__(self, name, detector):
         self.detector = detector
         self.values = []
         self.statuses = []
-        self.TRAINING_PERIOD = False
+        self.SEND_SIGNALS = True
 
-    def set_training_period(self, value):
+    def turn_on_signals(self):
         '''
-        If the data stream hasn't loaded all of the training data values, then
-        we should have self.set_training_period(True), and no drift signals will
-        be emitted. When actually observing data online, then we should have
-        self.set_training_period(False).
+        Use this function to stop the DataStream from sending warning and drift
+        signals. Useful for when the datastream is loading instances from the
+        training data.
         '''
-        self.TRAINING_PERIOD = value
+        self.SEND_SIGNALS = False
+
+    def turn_off_signals(self):
+        '''
+        Use this function to start the DataStream sending warning and drift
+        signals. Useful for when the datastream has finished loading instances
+        from the training data and is now deployed.
+        '''
+        self.SEND_SIGNALS = False
 
     def add_value(self, value, confidence=None):
         '''
@@ -46,15 +65,27 @@ class DataStream:
         self.values.append(value)
         self.statuses.append(status)
 
+        return status
+
     def send_warning_signal(self):
-        if self.training_period == False:
-            print('Drift warning in', self.name)
+        self.send_signal('Drift warning in {self.name}')
 
     def send_drift_signal(self):
-        if self.training_period == False:
-            print('Drift detected in', self.name)
+        self.send_signal(f'Drift detected in {self.name}')
+
+    def send_signal(self, signal):
+        '''
+        Action to be taken when a drift is detected or suspected for this DataStream.
+        By default the signal is simply printed.
+        '''
+        if self.SEND_SIGNALS == True:
+            print(signal)
 
     def get_current_status(self):
+        '''
+        Get the current status of the data stream. Is it normal, is drift
+        detected, or has a drift warning been activated?
+        '''
         return self.statuses[-1]
 
 
@@ -250,5 +281,4 @@ class MedTextDetector:
 '''
 TODO:
 - what happens with training true labels or predictions?
--
 '''
