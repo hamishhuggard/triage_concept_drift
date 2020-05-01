@@ -15,6 +15,12 @@ class TestMedTextStuff(unittest.TestCase):
         pass
 
     def test_medtext_detector(self):
+        '''
+        How can you test this thing?
+        - basic functionality: inputting and outputting the right types without error
+        - making sure it detects drifts within some time period
+        -
+        '''
         mtd = MedTextDetector()
         mtd.add_training_docs()
         mtd.add_training_label()
