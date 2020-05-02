@@ -3,6 +3,7 @@ from Tornado import DDM
 from cddm import CDDM
 from collections import defaultdict
 from data_stream import DataStream
+import os
 
 class MedTextDetector:
 
@@ -75,17 +76,34 @@ class MedTextDetector:
         self.loss_stream = DataStream('Loss', concept_dd(**concept_dd_kwargs))
 
         # Initialize the directories where data will be stored in ARFF format
-        self.root_dir = dir_name
-        self.dirs = {
-            x:os.path.join(dir_name, x) for x in
-            ['features', 'pred_labels', 'true_labels', 'loss']
-        }
-        for dir_name in self.dirs.values:
+        self.ROOT_DIR = os.path.abspath(dir_name)
+        self.paths = {}
+        for sub_dir in ['features', 'pred_labels', 'true_labels', 'loss']:
+            dir_path = os.path.join(self.ROOT_DIR, sub_dir)
+            self.paths[sub_dir] = {}
             if not os.path.exists(dir_name):
                 os.makedirs(dir_name)
-        
+            # Create the files where the values and drift statuses will be recorded
+            for fname in ['values.csv', 'statuses.csv']:
+                file_path = os.path.join(dir_path, fname)
+                self.paths[sub_dir][fname] = file_path
+                with open(file_path, 'w') as f:
+                    # Create the headers for the csv files
+                    if sub_dir.endswith('labels'):
+                        header = ','.join([str(i) for i in label_set]) + '\n'
+                    elif sub_dir == 'loss':
+                        header = 'loss\n'
+                    else:
+                        header = ''
+                    f.write(header)
+        annotations_path = os.path.join(self.ROOT_DIR, 'annotations.txt')
+        with open(annotations_path, 'w'):
+            pass
+        self.paths['annotations'] = annotations_path
+        self.ANNOTATIONS_SEP = '='*20 + '\n'
 
     def update_label_streams(self, stream_dicts, label, conf):
+
         for label_i in self.label_set:
             stream_dicts[label_i].add_value(label==label_i, conf)
 
