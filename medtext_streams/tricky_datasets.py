@@ -70,36 +70,26 @@ class BERNOULLI:
         arff_writer.close()
         print("You can find the generated files in " + output_path + "!")
 
+class BERNOULLI_V_DRIFT(BERNOULLI):
 
-
-class BERNOULLI_BASIC(BERNOULLI):
-
-    def __init__(self, noise=0.1, PX1=0.5 repeats=1, concept_length=25000, transition_length=500, random_seed=10):
-        c1 = [1-noise, noise]
-        c2 = [noise, 1-noise]
-        concepts = [(PX1, *c1), (PX1, *c2)] * repeats
+    def __init__(self, noise=0.25, PX1=0.5, concept_length=25000, transition_length=500, random_seed=10):
+        c1 = (PX1, noise, 1)
+        c2 = (1-PX1, noise, 1)
+        concepts = [c1, c2] * repeats
         super().__init__(concepts, concept_length, transition_length, random_seed)
 
-class BERNOULLI_FP(BERNOULLI):
+class BERNOULLI_VR_DRIFT(BERNOULLI):
 
-    def __init__(self, dPX1=0.1, noise=0.1, repeats=1, concept_length=25000, transition_length=500, random_seed=10):
-        c1 = [1-noise, noise]
-        concepts = [(0.5+dPX1, *c1), (0.5-dPX1, *c1)] * repeats
+    def __init__(self, noise=0.25, PX1=0.5, concept_length=25000, transition_length=500, random_seed=10):
+        c1 = (PX1, noise, 1)
+        c2 = (1-PX1, 1-noise, 1)
+        concepts = [c1, c2] * repeats
         super().__init__(concepts, concept_length, transition_length, random_seed)
 
+class BERNOULLI_R_DRIFT(BERNOULLI):
 
-class BERNOULLI_FN(BERNOULLI):
-
-    def __init__(self, noise=0.1, d_noise=0.1, repeats=1, concept_length=25000, transition_length=500, random_seed=10):
-        dPX1 = noise / (2*d_noise)
-        c1 = [1-noise, noise]
-        c2 = [1-noise-d_noise, noise+d_noise]
-        concepts = [(0.5+dPX1, *c1), (0.5-dPX1, *c2)] * repeats
-        super().__init__(concepts, concept_length, transition_length, random_seed)
-
-
-class BERNOULLI_TRICKY(BERNOULLI):
-
-    def __init__(self, epsilon=0.1, concept_length=25000, transition_length=500, random_seed=10):
-        concepts = [(0.5-epsilon, 0.9, 0.4), (0.5+epsilon, 0.9, 0.4)]
+    def __init__(self, noise=0.25, PX1=0.5, concept_length=25000, transition_length=500, random_seed=10):
+        c1 = (PX1, noise, 1)
+        c2 = (PX1, 1-noise, 1)
+        concepts = [c1, c2] * repeats
         super().__init__(concepts, concept_length, transition_length, random_seed)
