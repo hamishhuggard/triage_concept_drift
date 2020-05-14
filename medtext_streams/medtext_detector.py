@@ -5,6 +5,8 @@ from collections import defaultdict
 from data_stream import DataStream
 import os
 
+# TODO: combine pred_label_dd and true_label_dd
+
 class MedTextDetector:
 
     '''
@@ -12,6 +14,20 @@ class MedTextDetector:
     the labels. Each label_prediction is associated with an id, which allows
     them to be matched up with true_labels, in the event that the latter arrives
     in a different order than the former.
+
+    Example usage:
+    >>> md = MedTextDetector(
+        label_set=[1,2,3,4],
+        feature_dd=DDM,
+        label_dd=DDM,
+        concept_dd=CDDM
+    )
+    >>> md.add_training_docs(list_of_referral_docs)
+    >>> md.add_training_labels(list_of_referral_triage_labels)
+    >>> md.
+    # When a new referral document arrives
+    >>> md.add_new_doc()
+    # When a
     '''
 
     def __init__(
@@ -20,6 +36,7 @@ class MedTextDetector:
             label_set=[1,2,3,4], # the set of possible labels
             index_instances=False,
             dir_name=None,
+            drift_signal_output=print,
 
             feature_dd=None,
             true_label_dd=None,
@@ -75,7 +92,7 @@ class MedTextDetector:
         # Loss stream stuff
         self.loss_stream = DataStream('Loss', concept_dd(**concept_dd_kwargs))
 
-        # Initialize the directories where data will be stored in ARFF format
+        # Initialize the directories where data will be stored in CSV format
         self.ROOT_DIR = os.path.abspath(dir_name)
         self.paths = {}
         for sub_dir in ['features', 'pred_labels', 'true_labels', 'loss']:
