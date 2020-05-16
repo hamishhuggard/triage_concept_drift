@@ -1,13 +1,255 @@
-from bow_machine import BOWMachine
-from Tornado import DDM
-from cddm import CDDM
-from collections import defaultdict
-from data_stream import DataStream
+# from bow_machine import BOWMachine
+
+# I don't know how to do this properly
+import sys
 import os
+tornado_path = os.path.abspath('./tornado_med')
+sys.path.insert(0, tornado_path)
+from tornado_med.drift_detection.__init__ import *
 
-# TODO: combine pred_label_dd and true_label_dd
+from collections import defaultdict
+# from data_stream import DataStream
+import os
+from wasabi import color, Printer
+import numpy as np
 
-class MedTextDetector:
+class DataStream:
+
+    color_messages = True
+
+    message_colors = {
+        'NORMAL': 'green',
+        'WARNING': 'yellow',
+        'DRIFT': 'red'
+    }
+
+    def __init__(self, detector, drift_action=print, name='unknown'):
+        self.drift_action = drift_action
+        self.detector = detector
+        self.status = 'NORMAL'
+        self.name = name
+
+    def add_value(self, value, conf=None):
+        # conf is confidence. This is for CDDM.
+
+        # Determine if this data stream has drifted
+        if conf:
+            warning_status, drift_status = self.detector.detect(value, conf)
+        else:
+            warning_status, drift_status = self.detector.detect(value)
+
+        if drift_status:
+            new_status = 'DRIFT'
+        elif warning_status:
+            new_status = 'WARNING'
+        else:
+            new_status = 'NORMAL'
+
+        if new_status=='NORMAL' and self.status=='DRIFT':
+            # Once a drift is detected you don't want to go back to undetected
+            new_status = 'DRIFT'
+
+        # If the status has changed then send do a drift action
+        if new_status != self.status:
+            message = f'The status of {self.name} has changed to '
+            if DataStream.color_messages:
+                bg_color = DataStream.message_colors[new_status]
+                message += color(new_status, fg="white", bg=bg_color, bold=True)
+            else:
+                message += new_status
+            self.drift_action(message)
+            self.status = new_status
+
+        return new_status
+
+    def get_status(self):
+        return self.status
+
+class MultiDriftDetector:
+
+    # These are the drift detection algorithms to detect:
+    feature_dd=RDDM#HDDM_A_test # feature drift
+    label_dd=RDDM#HDDM_A_test # label drift
+    concept_dd=RDDM#HDDM_A_test # concept drift
+
+    # And these are the kwargs for instantiating the drift detectors.
+    feature_dd_kwargs={}
+    label_dd_kwargs={}
+    concept_dd_kwargs={}
+
+    def __init__(
+            self,
+            write_dir,
+            drift_action=print
+        ):
+
+        self.write_dir = write_dir
+        self.drift_action = drift_action
+
+        # Set up the directories
+        root = self.root_dir = os.path.abspath(write_dir)
+        fdir = self.feature_dir = os.path.join(root, 'features')
+        pdir = self.predictions_dir = os.path.join(root, 'predictions')
+        if not os.path.exists(fdir):
+            os.makedirs(fdir)
+        if not os.path.exists(pdir):
+            os.makedirs(pdir)
+
+        # Create the record of model loss
+        self.loss_file = os.path.join(root, 'loss.csv')
+        with open(self.loss_file, 'w') as f:
+            f.write('value,status,description\n')
+        self.loss_stream = DataStream(
+            drift_action = self.drift_action,
+            detector = MultiDriftDetector.concept_dd(**MultiDriftDetector.concept_dd_kwargs),
+            name = 'Concept Drift'
+        )
+
+        self.prediction_queue = {}
+
+    def init_file(self, fpath):
+        with open(fpath, 'w') as f:
+            f.write('value,status,description\n')
+
+    def append_file(self, fpath, value, status, description):
+        with open(fpath, 'a') as f:
+            f.write(f'{value},{status},"{description}"\n')
+
+    def set_features(self, feature_names):
+
+        self.feature_names = feature_names
+
+        # Set up a DataStream object to monitor each feature.
+        self.feature_streams = {
+            feature_name: DataStream(
+                drift_action = self.drift_action,
+                detector = MultiDriftDetector.feature_dd(**MultiDriftDetector.feature_dd_kwargs),
+                name = feature_name
+            ) for feature_name in feature_names
+        }
+
+        # Create the header for the feature files
+        for feature_name in feature_names:
+            feature_path = os.path.join(self.feature_dir, feature_name+'.csv')
+            self.init_file(feature_path)
+
+    def set_labels(self, label_names):
+
+        self.label_names = label_names
+
+        # Set up a DataStream object to monitor each label value.
+        self.label_streams = {
+            label_name: DataStream(
+                drift_action = self.drift_action,
+                detector = MultiDriftDetector.label_dd(**MultiDriftDetector.label_dd_kwargs),
+                name = label_name
+            ) for label_name in label_names
+        }
+
+        # Create the header for the feature files
+        for label_name in label_names:
+            label_path = os.path.join(self.predictions_dir, label_name+'.csv')
+            self.init_file(label_path)
+
+    def add_instance(self, instance, instance_id, description=''):
+
+        for feature_name, value in zip(self.feature_names, instance):
+            feature_stream = self.feature_streams[feature_name]
+            status = feature_stream.add_value(value)
+            feature_path = os.path.join(self.feature_dir, feature_name+'.csv')
+            self.append_file(feature_path, value, status, description)
+
+    def add_label(self, label, instance_id, description=''):
+
+        # retrieve from queue with confidence
+        (prediction, confidence) = self.prediction_queue[instance_id]
+
+        value = label != prediction
+
+        if MultiDriftDetector.concept_dd.DETECTOR_NAME == 'CDDM':
+            status = self.loss_stream.add_value(value, confidence)
+        else:
+            status = self.loss_stream.add_value(value)
+
+        self.append_file(self.loss_file, value, status, description)
+
+    def add_prediction(self, prediction, instance_id, description=''):
+
+        label = self.label_names[np.argmax(prediction)]
+        confidence = np.max(prediction)
+
+        for label_name in self.label_names:
+            value = label_name == label
+            label_stream = self.label_streams[label_name]
+            status = label_stream.add_value(value)
+            label_path = os.path.join(self.predictions_dir, label_name+'.csv')
+            self.append_file(label_path, value, status, description)
+
+        self.prediction_queue[instance_id] = (label, confidence)
+
+    def get_status(self):
+
+        msg = Printer()
+
+        # Display concept drift status
+        concept_status = self.loss_stream.get_status()
+        if concept_status == 'DRIFT':
+            msg.fail('Concept drift detected.')
+        elif concept_status == 'WARNING':
+            msg.warn('Concept drift suspected.')
+        else:
+            msg.good('No concept drift detected.')
+
+        # Display feature drift status
+        warn_features = []
+        drift_features = []
+        for feature in self.feature_names:
+            feature_status = self.feature_streams[feature].get_status()
+            if feature_status == 'DRIFT':
+                drift_features.append(feature)
+            elif feature_status == 'WARN':
+                warn_features.append(feature)
+        if len(warn_features) > 0:
+            msg.warn('Feature drift suspected on the following: '+','.join(warn_features))
+        if len(drift_features) > 0:
+            msg.fail('Feature drift detected on the following: '+','.join(drift_features))
+        if len(drift_features)==0 and len(warn_features)==0:
+            msg.good('No feature drift detected.')
+
+        # Display label drift status
+        warn_labels = []
+        drift_labels = []
+        for label in self.label_names:
+            label_status = self.label_streams[label].get_status()
+            if label_status == 'DRIFT':
+                drift_labels.append(label)
+            elif label_status == 'WARN':
+                warn_labels.append(label)
+        if len(warn_labels) > 0:
+            msg.warn('Label drift suspected on the following: '+','.join(warn_labels))
+        if len(drift_labels) > 0:
+            msg.fail('Label drift detected on the following: '+','.join(drift_labels))
+        if len(drift_labels)==0 and len(warn_labels)==0:
+            msg.good('No label drift detected.')
+
+    '''
+    Implement these so that the model can be interrupted and restored
+    '''
+
+    def read_prediction_queue(self):
+        pass
+
+    def add_to_prediction_queue(self, instance_id, prediction, confidence):
+        pass
+
+    def get_from_prediction_queue(self, instance_id):
+        pass
+
+    def restore(self):
+        pass
+
+
+class TriageDetector0:
 
     '''
     The order in which label_predictions arrive is the canonical order of these
@@ -36,7 +278,7 @@ class MedTextDetector:
             label_set=[1,2,3,4], # the set of possible labels
             index_instances=False,
             dir_name=None,
-            drift_signal_output=print,
+            drift_action=print,
 
             feature_dd=None,
             true_label_dd=None,

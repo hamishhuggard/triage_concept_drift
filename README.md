@@ -1,19 +1,47 @@
 # Triage Concept Drift
 
-Code produced by Hamish Huggard for his Master's Degree in computer science at UoA.
+A package for detecting concept drift in medical referrals triage.
 
-Reproduce the Conda environment I used with
+## Instructions
+
+### Setup
+
+Step 1. Clone the package.
 ```
+git clone https://github.com/precisiondrivenhealth/triage_drift_detector.git
+```
+
+Step 2. Build the conda environment.
+```
+cd triage_drift_detector
 conda env create -f=env.yml
 ```
+
+Step 3. Activate the environment.
+```
+conda activate triage_drift_env
+```
+
+### Drift Detector Usage
+
+A demonstration of how to use the drift detector is given in [demo.ipynb](demo.ipynb).
+
+In order to use the new environment in the notebook, you will need to have `nb_conda_kernels` installed in the base environment:
+```
+conda deactivate
+conda install nb_conda_kernels
+```
+
+### Graphic Interface
+
+
+
+
+
 
 ### Conda cheatsheet
 
 This is for my own benefit.
-
-What is conda?
- * conda = virtualenv + pip
- * If you have conda you don't need virtualenv, but you still need docker
 
 Create an environment with
 ```conda create --name <envname> python=<version> <optional dependencies>
