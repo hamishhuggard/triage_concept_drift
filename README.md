@@ -69,12 +69,12 @@ Step 5. When a new instance (referral document) arrives, register it with the dr
 
 Step 6. When the model makes a new prediction, register it with the drift detector
 ```
->>> detector.add_instance([softmax1, softmax2, ...], id=...)
+>>> detector.add_prediction([softmax1, softmax2, ...], id=...)
 ```
 
 Step 7. When a new ground-truth label (i.e., clinician triage label) arrives, register it with the drift detector
 ```
->>> detector.add_instance(labelN, id=...)
+>>> detector.add_label(labelN, id=...)
 ```
 
 Note that all these registration steps require an instance id.
