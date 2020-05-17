@@ -12,6 +12,7 @@ from collections import defaultdict
 import os
 from wasabi import color, Printer
 import numpy as np
+from copy import copy
 
 class DataStream:
 
@@ -23,38 +24,52 @@ class DataStream:
         'DRIFT': 'red'
     }
 
-    def __init__(self, detector, drift_action=print, name='unknown'):
+    def __init__(self, detector, drift_action=print, name='unknown', bidirectional=True):
         self.drift_action = drift_action
         self.detector = detector
         self.status = 'NORMAL'
         self.name = name
+        self.bidirectional = bidirectional
+        self.detector2 = copy(detector) if bidirectional else None
+        self.drift_direction = 'NORMAL'
 
     def add_value(self, value, conf=None):
+
+        # Once drift is detected no further work is required.
+        if self.status == 'DRIFT':
+            return 'DRIFT'
+
         # conf is confidence. This is for CDDM.
 
         # Determine if this data stream has drifted
         if conf:
             warning_status, drift_status = self.detector.detect(value, conf)
+            if self.bidirectional:
+                warning_status2, drift_status2 = self.detector2.detect(not value, conf)
+            else:
+                warning_status2, drift_status2 = False, False
         else:
             warning_status, drift_status = self.detector.detect(value)
+            if self.bidirectional:
+                warning_status2, drift_status2 = self.detector2.detect(not value)
+            else:
+                warning_status2, drift_status2 = False, False
 
-        if drift_status:
+        if drift_status or drift_status2:
             new_status = 'DRIFT'
-        elif warning_status:
+            self.direction = 'INCREASE' if drift_status else 'DECREASE'
+        elif warning_status or warning_status2:
             new_status = 'WARNING'
+            self.direction = 'INCREASE' if warning_status else 'DECREASE'
         else:
             new_status = 'NORMAL'
 
-        if new_status=='NORMAL' and self.status=='DRIFT':
-            # Once a drift is detected you don't want to go back to undetected
-            new_status = 'DRIFT'
-
-        # If the status has changed then send do a drift action
+        # If the status has changed then do a drift action
         if new_status != self.status:
             message = f'The status of {self.name} has changed to '
             if DataStream.color_messages:
                 bg_color = DataStream.message_colors[new_status]
-                message += color(new_status, fg="white", bg=bg_color, bold=True)
+                message += color(new_status, fg="black", bg=bg_color, bold=True)
             else:
                 message += new_status
             self.drift_action(message)
@@ -68,14 +83,9 @@ class DataStream:
 class MultiDriftDetector:
 
     # These are the drift detection algorithms to detect:
-    feature_dd=RDDM#HDDM_A_test # feature drift
-    label_dd=RDDM#HDDM_A_test # label drift
-    concept_dd=RDDM#HDDM_A_test # concept drift
-
-    # And these are the kwargs for instantiating the drift detectors.
-    feature_dd_kwargs={}
-    label_dd_kwargs={}
-    concept_dd_kwargs={}
+    feature_dd=HDDM_A_test(warning_confidence=0.001, drift_confidence=0.0005) # feature drift
+    label_dd=copy(feature_dd) # label drift
+    concept_dd=HDDM_A_test(warning_confidence=0.01, drift_confidence=0.005) # concept drift
 
     def __init__(
             self,
@@ -101,7 +111,7 @@ class MultiDriftDetector:
             f.write('value,status,description\n')
         self.loss_stream = DataStream(
             drift_action = self.drift_action,
-            detector = MultiDriftDetector.concept_dd(**MultiDriftDetector.concept_dd_kwargs),
+            detector = copy(MultiDriftDetector.concept_dd),
             name = 'Concept Drift'
         )
 
@@ -123,8 +133,9 @@ class MultiDriftDetector:
         self.feature_streams = {
             feature_name: DataStream(
                 drift_action = self.drift_action,
-                detector = MultiDriftDetector.feature_dd(**MultiDriftDetector.feature_dd_kwargs),
-                name = feature_name
+                detector = copy(MultiDriftDetector.feature_dd),
+                name = feature_name,
+                bidirectional=True
             ) for feature_name in feature_names
         }
 
@@ -141,8 +152,9 @@ class MultiDriftDetector:
         self.label_streams = {
             label_name: DataStream(
                 drift_action = self.drift_action,
-                detector = MultiDriftDetector.label_dd(**MultiDriftDetector.label_dd_kwargs),
-                name = label_name
+                detector = copy(MultiDriftDetector.label_dd),
+                name = label_name,
+                bidirectional=True
             ) for label_name in label_names
         }
 
@@ -155,16 +167,18 @@ class MultiDriftDetector:
 
         for feature_name, value in zip(self.feature_names, instance):
             feature_stream = self.feature_streams[feature_name]
-            status = feature_stream.add_value(value)
+            status = feature_stream.add_value(bool(value))
             feature_path = os.path.join(self.feature_dir, feature_name+'.csv')
             self.append_file(feature_path, value, status, description)
+
+            # print(feature_name, 'settings', feature_stream.detector.get_settings())
 
     def add_label(self, label, instance_id, description=''):
 
         # retrieve from queue with confidence
         (prediction, confidence) = self.prediction_queue[instance_id]
 
-        value = label != prediction
+        value = label == prediction
 
         if MultiDriftDetector.concept_dd.DETECTOR_NAME == 'CDDM':
             status = self.loss_stream.add_value(value, confidence)
@@ -172,6 +186,8 @@ class MultiDriftDetector:
             status = self.loss_stream.add_value(value)
 
         self.append_file(self.loss_file, value, status, description)
+
+        # print('loss settings', self.loss_stream.detector.get_settings())
 
     def add_prediction(self, prediction, instance_id, description=''):
 
@@ -184,6 +200,8 @@ class MultiDriftDetector:
             status = label_stream.add_value(value)
             label_path = os.path.join(self.predictions_dir, label_name+'.csv')
             self.append_file(label_path, value, status, description)
+
+            # print(label_name, 'settings', label_stream.detector.get_settings())
 
         self.prediction_queue[instance_id] = (label, confidence)
 
@@ -198,7 +216,7 @@ class MultiDriftDetector:
         elif concept_status == 'WARNING':
             msg.warn('Concept drift suspected.')
         else:
-            msg.good('No concept drift detected.')
+            msg.good('Loss distribution normal.')
 
         # Display feature drift status
         warn_features = []
@@ -210,11 +228,11 @@ class MultiDriftDetector:
             elif feature_status == 'WARN':
                 warn_features.append(feature)
         if len(warn_features) > 0:
-            msg.warn('Feature drift suspected on the following: '+','.join(warn_features))
+            msg.warn('Feature drift suspected on the following: '+', '.join(warn_features))
         if len(drift_features) > 0:
-            msg.fail('Feature drift detected on the following: '+','.join(drift_features))
+            msg.fail('Feature drift detected on the following: '+', '.join(drift_features))
         if len(drift_features)==0 and len(warn_features)==0:
-            msg.good('No feature drift detected.')
+            msg.good('Feature distribution normal.')
 
         # Display label drift status
         warn_labels = []
@@ -226,11 +244,11 @@ class MultiDriftDetector:
             elif label_status == 'WARN':
                 warn_labels.append(label)
         if len(warn_labels) > 0:
-            msg.warn('Label drift suspected on the following: '+','.join(warn_labels))
+            msg.warn('Label drift suspected on the following: '+', '.join(warn_labels))
         if len(drift_labels) > 0:
-            msg.fail('Label drift detected on the following: '+','.join(drift_labels))
+            msg.fail('Label drift detected on the following: '+', '.join(drift_labels))
         if len(drift_labels)==0 and len(warn_labels)==0:
-            msg.good('No label drift detected.')
+            msg.good('Label distribution normal.')
 
     '''
     Implement these so that the model can be interrupted and restored
