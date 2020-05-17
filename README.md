@@ -96,6 +96,7 @@ The app is run as follows, where the argument is the directory that the drift de
 ```
 (triage_drift_env)$ python drift_viewer/app.py data/demo
 ```
+Unfortunately, this isn't working right now because I introduced a bug which I haven't been able to fix.
 
 ## TODO
 
