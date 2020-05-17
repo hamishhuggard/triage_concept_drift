@@ -35,41 +35,47 @@ Most of the time it is only real drift that requires retraining.
 
 ## Instructions
 
-### Setup
+### Environment
 
 Step 1. Clone the package.
 ```
-git clone https://github.com/precisiondrivenhealth/triage_drift_detector.git
+(base)$ git clone https://github.com/precisiondrivenhealth/triage_drift_detector.git
 ```
 
 Step 2. Build the conda environment.
 ```
-cd triage_drift_detector
-conda env create -f=env.yml
+(base)$ cd triage_drift_detector
+(base)$ conda env create -f=env.yml
 ```
 
 Step 3. Activate the environment.
 ```
-conda activate triage_drift_env
+(base)$ conda activate triage_drift_env
+```
+
+Step 4. (Optional) If you want to use this environment in any notebooks, you will need to have `nb_conda_kernels` installed in the base environment. This will be necessary, for example, if you want to run `demo.ipynb`.
+```
+(triage_drift_env)$ conda deactivate
+(base)$ conda install nb_conda_kernels
 ```
 
 ### Drift Detector Usage
 
 Step 1. Write a function to specify what should happen to messages signalling that drift has occurred.
 ```
-def send_drift_signal(signal):
+>>> def send_drift_signal(signal):
   pass
 ```
 
 Step 2. Specify a directory that the state of the drift detector should be recorded in.
 This allows the drift detector to be restored if it is interrupted, and also allows the dash app to visualise the history of the detector.
 ```
-write_dir = './data/demo'
+>>> write_dir = './data/demo'
 ```
 
 Step 3. Create a `MultiDriftDetector` object.
 ```
-detector = MultiDriftDetector(
+>>> detector = MultiDriftDetector(
     write_dir = write_dir,
     drift_action = display_message
 )
@@ -77,23 +83,23 @@ detector = MultiDriftDetector(
 
 Step 4. Specify the set of features and labels in the data stream
 ```
-detector.set_features(['Feature0', 'Feature1', ...])
-detector.set_labels(['Priority0', 'Priority1', ...])
+>>> detector.set_features(['Feature0', 'Feature1', ...])
+>>> detector.set_labels(['Priority0', 'Priority1', ...])
 ```
 
 Step 5. When a new instance (referral document) arrives, register it with the drift detector
 ```
-detector.add_instance([value1, value2, ...], id=...)
+>>> detector.add_instance([value1, value2, ...], id=...)
 ```
 
 Step 6. When the model makes a new prediction, register it with the drift detector
 ```
-detector.add_instance([softmax1, softmax2, ...], id=...)
+>>> detector.add_instance([softmax1, softmax2, ...], id=...)
 ```
 
 Step 7. When a new ground-truth label (i.e., clinician triage label) arrives, register it with the drift detector
 ```
-detector.add_instance(labelN, id=...)
+>>> detector.add_instance(labelN, id=...)
 ```
 
 Note that all these registration steps require an instance id.
@@ -102,20 +108,27 @@ This is necessary to track real drift.
 
 For each of the registration steps, there is also an optional `description` argument
 ```
-detector.add_instance(labelN, id=..., description="...")
+>>> detector.add_instance(labelN, id=..., description="...")
 ```
 This is added to the hover-text of this data point in the graphical interface.
 
 A detailed illustration of `MultiDriftDetector` usage is given in [demo.ipynb](demo.ipynb).
 
-Note that in order to use the `traige_drift_env` environment in the notebook, you will need to have `nb_conda_kernels` installed in the base environment:
-```
-conda deactivate
-conda install nb_conda_kernels
-```
-
 ### Graphic Interface
 
+After the drift detector has run, you can visualise the evolution of the data stream using the dash app.
+The app is run as follows, where the argument is the directory that the drift detector was writing its status to.
+```
+(triage_drift_env)$ python drift_viewer/app.py data/demo
+```
+
+## TODO
+
+ * Implement code in `MultiDriftDetector` for restoring from interrupt.
+ * Fix dash app. Nevermind callback logic for now.
+ * Differentiate concept drift detector from real drift detector?
+ * In README, describe the contents of the repository
+ * In README, talk about the choice of underlying drift detector.
 
 <!--
 

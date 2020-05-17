@@ -1,14 +1,13 @@
 from panels import *
-# from detection import *
 # from stream_reading import StreamReader
 
 ######################
 ### CONTROL PANELS ###
 ######################
 
-stream_reader = StreamReader("Choose a Datastream")
+# stream_reader = StreamReader("Choose a Datastream")
 
-detections = stream_reader.get_accuracy()
+# detections = stream_reader.get_accuracy()
 
 # Truncation panel
 
@@ -27,32 +26,34 @@ smoother = Smoother()
 smoother.connect_output(detections)
 smoothing_panel = ControlPanel("Smoothing", [smoother])
 
-# Data stream / scenario panel
+data_panel = ControlPanel([stream_reader])
 
-learner = Learner("Choose a Learner")
-detector_panel = DetectorPanel("Choose a Drift Detector")
+####################
+### LOADING DATA ###
+####################
 
-data_panel = ControlPanel([stream_reader, learner, detector_panel])
+def load_data():
+    pass
+
+
 
 #################
 ### LOGICS    ###
 #################
 
-features = stream_reader.get_features()
-labels = stream_reader.get_labels()
-predictions = learner.predict(features, labels)
-detections = detector.detect(labels, predictions)
+# features = stream_reader.get_features()
+# labels = stream_reader.get_labels()
+# loss = stream_reader.get_loss()
 
-# Truncate data streams
-feature_truncator.connect_outputs(features)
-label_truncator.connect_outputs(labels)
-predictions_truncator.connect_outputs(predictions)
-
-
-# Smooth data streams
-smoother.connect_outputs(features)
-smoother.connect_outputs(labels)
-smoother.connect_outputs(predictions)
+# # Truncate data streams
+# feature_truncator.connect_outputs(features)
+# label_truncator.connect_outputs(labels)
+# predictions_truncator.connect_outputs(predictions)
+#
+# # Smooth data streams
+# smoother.connect_outputs(features)
+# smoother.connect_outputs(labels)
+# smoother.connect_outputs(predictions)
 
 
 ##############
