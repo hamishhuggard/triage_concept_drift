@@ -28,7 +28,7 @@ Step 3. Activate the environment.
 (base)$ conda activate triage_drift_env
 ```
 
-Step 4. (Optional) If you want to use this environment in any notebooks, you will need to have `nb_conda_kernels` installed in the base environment. This will be necessary, for example, if you want to run `demo.ipynb`.
+Step 4. (Optional) If you want to use this environment in any notebooks, you will need to have `nb_conda_kernels` installed in the base environment. This will be necessary, for example, if you want to run [demo.ipynb](demo.ipynb).
 ```
 (triage_drift_env)$ conda deactivate
 (base)$ conda install nb_conda_kernels
@@ -39,7 +39,7 @@ Step 4. (Optional) If you want to use this environment in any notebooks, you wil
 Step 1. Write a function to specify what should happen to messages signalling that drift has occurred.
 ```
 >>> def send_drift_signal(signal):
-  pass
+  ...
 ```
 
 Step 2. Specify a directory that the state of the drift detector should be recorded in.
@@ -50,7 +50,7 @@ This allows the drift detector to be restored if it is interrupted, and also all
 
 Step 3. Create a `MultiDriftDetector` object.
 ```
->>> detector = MultiDriftDetector(
+>>> detector = triage_detector.triage_detector.MultiDriftDetector(
     write_dir = write_dir,
     drift_action = display_message
 )
