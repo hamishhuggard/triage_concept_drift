@@ -4,34 +4,9 @@ A package for detecting concept drift in medical referrals triage.
 
 ## A Primer On Drift
 
-*Drift* is a change in the distribution of a data stream. A stream $z_1,z_2,\dots,z_n$ is said to experience drift when
-$$
-P_t(z) \ne P_{t'}(z)
-$$
-for some $t$ and $t'$.
+This section has been moved to [primer.ipynb](primer.ipynb) because github doesn't like Latex in READMEs.
 
-*Concept drift* is any change in the joint distribution of features and labels. That is,
-$$
-P_t(x,y) \ne P_{t'}(x,y).
-$$
-However, simply learning that concept drift has occurred is not very helpful.
-This package therefore separately detects three kinds of concept drift.
-
-First, there is *feature drift*, which is a drift in the feature space:
-$$
-P_t(x) \ne P_{t'}(x).
-$$
-
-Second, there is *label drift*, which is a drift in the label space:
-$$
-P_t(y) \ne P_{t'}(y).
-$$
-
-Third, there is *real drift*, which is a drift in conditional distribution of labels on features:
-$$
-P_t(y|x) \ne P_{t'}(y|x)
-$$
-Most of the time it is only real drift that requires retraining.
+It gives an introduction to the vocabulary used throughout.
 
 ## Instructions
 
