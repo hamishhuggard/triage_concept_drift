@@ -53,7 +53,7 @@ class PercentSlider(PanelItem, dcc.Slider):
     A slider from 0 to 100.
     '''
 
-    def __init__(self, value=50):
+    def __init__(self, value=100):
 
         dcc.Slider.__init__(
             self,
@@ -298,9 +298,11 @@ class Smoother(CallBackLogic, html.Div):
         '''
         # Convert win_width from percentage to absolute
         # win_width = int(len(x) * win_width / 800)
-        x = np.array(x)
+        x = np.array(x, dtype='int')
         if win_width < 3:
             return x
+        if len(x) == 0:
+            return []
         s = np.r_[2*x[0]-x[win_width-1::-1], x,
                     2*x[-1]-x[-1:-win_width:-1]]
         if win_shape == 'flat': #moving average
@@ -335,4 +337,5 @@ class Smoother(CallBackLogic, html.Div):
         y = output.y
         win_width = self.slider.value
         win_shape = self.dropdown.value
+        print(output.id_, output.y)
         output.y = Smoother.smooth(y, win_width, win_shape)

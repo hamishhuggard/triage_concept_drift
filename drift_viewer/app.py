@@ -15,7 +15,7 @@ from glob import glob
 # Truncation panel
 
 feature_truncator = Truncator("Features Truncation (%)")
-prediction_truncator = Truncator("Predictions Truncation (%)")
+prediction_truncator = Truncator("Accuracy Truncation (%)")
 label_truncator = Truncator("Labels Truncation (%)")
 
 truncating_panel = ControlPanel(
@@ -67,7 +67,7 @@ def get_plots(streams):
 def load_data(dir):
     global app, smoother, feature_truncator, prediction_truncator, label_truncator
 
-    loss_path = os.path.join(dir, 'loss.csv')
+    loss_path = os.path.join(dir, 'accuracy.csv')
     loss_stream = DataStream(loss_path)
 
     feature_streams = []
@@ -77,9 +77,9 @@ def load_data(dir):
     for label_path in glob(dir+'/predictions/*.csv'):
         label_streams.append(DataStream(label_path))
 
-    feature_truncator.connect_output(loss_stream)
-    prediction_truncator.connect_outputs(label_streams)
-    label_truncator.connect_outputs(feature_streams)
+    prediction_truncator.connect_output(loss_stream)
+    feature_truncator.connect_outputs(feature_streams)
+    label_truncator.connect_outputs(label_streams)
 
     smoother.connect_output(loss_stream)
     smoother.connect_outputs(label_streams)

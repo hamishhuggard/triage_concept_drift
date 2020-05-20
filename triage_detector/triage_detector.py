@@ -128,7 +128,7 @@ class MultiDriftDetector:
             os.makedirs(pdir)
 
         # Create the record of model loss
-        self.loss_file = os.path.join(root, 'loss.csv')
+        self.loss_file = os.path.join(root, 'accuracy.csv')
         with open(self.loss_file, 'w') as f:
             f.write('value,status,description\n')
         self.loss_stream = DataStream(
