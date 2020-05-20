@@ -20,14 +20,13 @@ if __name__ == '__main__':
     ######################
 
     # Truncation panel
-
+    accuracy_truncator = Truncator("Accuracy Truncation (%)")
     feature_truncator = Truncator("Features Truncation (%)")
-    prediction_truncator = Truncator("Accuracy Truncation (%)")
     label_truncator = Truncator("Labels Truncation (%)")
 
     truncating_panel = ControlPanel(
         "Truncate Data Streams",
-        [feature_truncator, label_truncator, prediction_truncator]
+        [accuracy_truncator, label_truncator, feature_truncator]
     )
 
     # Smoothing panel
@@ -57,7 +56,7 @@ if __name__ == '__main__':
     ### LOGICS    ###
     #################
 
-    prediction_truncator.connect_output(loss_stream)
+    accuracy_truncator.connect_output(loss_stream)
     feature_truncator.connect_outputs(feature_streams)
     label_truncator.connect_outputs(label_streams)
 

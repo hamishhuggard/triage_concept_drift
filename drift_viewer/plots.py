@@ -61,14 +61,14 @@ class DataStream:
         ]
 
     def get_status(self):
-        return list(self.STATUS)[-1]
+        return list(self.status)[-1]
 
 class StatusViewer:
 
     def __init__(self):
         pass
 
-    
+
 
 # class CategoryStream(DataStream):
 #
