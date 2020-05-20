@@ -94,14 +94,14 @@ A detailed illustration of `MultiDriftDetector` usage is given in [demo.ipynb](d
 After the drift detector has run, you can visualise the evolution of the data stream using the dash app.
 The app is run as follows, where the argument is the directory that the drift detector was writing its status to.
 ```
-(triage_drift_env)$ python drift_viewer/app.py data/demo
+(triage_drift_env)$ cd drift_viewer
+(triage_drift_env)$ python app.py ../data/demo
 ```
 Unfortunately, this isn't working right now because I introduced a bug which I haven't been able to fix.
 
 ## TODO
 
  * Implement code in `MultiDriftDetector` for restoring from interrupt.
- * Fix dash app. Nevermind callback logic for now.
  * Differentiate concept drift detector from real drift detector?
  * In README, describe the contents of the repository
  * In README, talk about the choice of underlying drift detector.
