@@ -36,7 +36,7 @@ class DataStream:
         figure = { 'data': self.get_data() }
         if len(self.title) > 0:
             title = self.title + ' '
-        figure['layout'] = {'title': f'{title} ({self.get_status()})'}
+        figure['layout'] = {'title': f'{title} ({self.get_status()})', 'yaxis': dict(range=[-0.1,1.1])}
         return figure
 
     def get_data(self):

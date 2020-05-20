@@ -270,7 +270,7 @@ class StreamReader(CallBackLogic, html.Div):
 class Truncator(CallBackLogic, html.Div):
 
     def __init__(self, title=''):
-        self.slider = PercentSlider(value=50)
+        self.slider = PercentSlider(value=100)
         CallBackLogic.__init__(self)
         html.Div.__init__(self, [html.H5(title), self.slider])
         self.connect_input(self.slider)
