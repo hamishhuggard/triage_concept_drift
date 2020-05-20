@@ -4,6 +4,7 @@ import dash_html_components as html
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
+import re
 
 class DataStream:
 
@@ -19,6 +20,9 @@ class DataStream:
         self.path = path
         self.title = re.match('.+/(\w+).csv', path).group(1)
         content = pd.read_csv(path)
+
+        # print(self.title, 'loaded csv')
+        # print(content.head())
 
         self.x = self.X = list(content.index)
         self.y = self.Y = content.value
@@ -37,7 +41,7 @@ class DataStream:
 
     def get_data(self):
         marker = {}#'label': self.X}
-        color_dict = {'Drift': 'red', 'Warning': 'orange', 'Normal': 'green'}
+        color_dict = {'DRIFT': 'red', 'WARNING': 'orange', 'NORMAL': 'green'}
         if len(self.status) > 0:
             marker['color'] = [ color_dict[s] for s in self.status ]
         text = [
