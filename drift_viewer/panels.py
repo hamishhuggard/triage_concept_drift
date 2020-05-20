@@ -303,14 +303,16 @@ class Smoother(CallBackLogic, html.Div):
             return x
         if len(x) == 0:
             return []
-        s = np.r_[2*x[0]-x[win_width-1::-1], x,
-                    2*x[-1]-x[-1:-win_width:-1]]
+        s = np.r_[x[win_width-1::-1], x,
+                    x[-1:-win_width:-1]]
         if win_shape == 'flat': #moving average
                 w=np.ones(win_width,'d')
         else:
                 w=eval('np.'+win_shape+'(win_width)')
         y=np.convolve(w/w.sum(), s, mode='same')
         return y[win_width:-win_width+1]
+        # y = np.convolve(w/w.sum(), x, mode='same')
+        return y
 
     def __init__(self, title="Curve Smoothing"):
 
@@ -337,4 +339,4 @@ class Smoother(CallBackLogic, html.Div):
         y = output.y
         win_width = self.slider.value
         win_shape = self.dropdown.value
-        output.y = Smoother.smooth(y, win_width, win_shape)
+        output.y = Smoother.smooth(y, win_width*2, win_shape)

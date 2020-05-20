@@ -103,7 +103,12 @@ If you open `http://127.0.0.1:8050/` in a browser, you should see the following 
 
 On the left we have two control panels:
  * __Truncate Data Streams__ lets you cut off the last $x$% of the data stream to see how it looked previously. The three sliders let you truncate the accuracy, labels, and features streams separately.
- * __Smoothing__ lets you change the smoothness of the plots. Smoothing is achieved via kernels, and you can adjust both the kernel shape and the width of the kernel. In layman's terms, the slider lets you adjust how smooth the kernel is. 
+ * __Smoothing__ lets you change the smoothness of the plots. Smoothing is achieved via kernels, and you can adjust both the kernel shape and the width of the kernel. In layman's terms, the slider lets you adjust how smooth the kernel is.
+
+On the right we have three tabs:
+ * __Accuracy tab__ shows how the accuracy is evolving over time.
+ * __Labels tab__ shows how the rate of each of the labels is evolving over time.
+ * __Features tab__ shows how the values of each of the features are evolving over time. In the case of free text, it shows how the frequency of different tokens are evolving over time.
 
 ## TODO
 
