@@ -33,7 +33,10 @@ class DataStream:
         figure = { 'data': self.get_data() }
         if len(self.title) > 0:
             title = self.title + ' '
-        figure['layout'] = {'title': f'{title} ({self.get_status()})', 'yaxis': dict(range=[-0.1,1.1])}
+        figure['layout'] = {'title': f'{title} ({self.get_status()})'}
+        # If this is a binary variable, set the limits of the y-axis to about 0 and 1
+        if ((0 == np.array(self.Y)) | (np.array(self.Y) == 1)).all():
+            figure['layout']['yaxis'] = dict(range=[-0.1,1.1])
         return figure
 
     def get_data(self):
