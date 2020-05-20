@@ -98,7 +98,8 @@ The app is run as follows, where the argument is the directory that the drift de
 (triage_drift_env)$ python app.py ../data/demo
 ```
 If you open `http://127.0.0.1:8050/` in a browser, you should see the following screen:
-![demo][demo.png]
+
+![demo](demo.png)
 
 ## TODO
 
