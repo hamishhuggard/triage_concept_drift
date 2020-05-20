@@ -314,7 +314,7 @@ class Smoother(CallBackLogic, html.Div):
 
     def __init__(self, title="Curve Smoothing"):
 
-        self.slider = PercentSlider()
+        self.slider = PercentSlider(20)
 
         dropdown_opts = [ {'label': i, 'value': i} for i in Smoother.SMOOTH_SHAPES ]
         self.dropdown = DropDownItem(options=dropdown_opts, value='hanning')
@@ -337,5 +337,4 @@ class Smoother(CallBackLogic, html.Div):
         y = output.y
         win_width = self.slider.value
         win_shape = self.dropdown.value
-        print(output.id_, output.y)
         output.y = Smoother.smooth(y, win_width, win_shape)

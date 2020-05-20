@@ -21,9 +21,6 @@ class DataStream:
         self.title = re.match('.+/(\w+).csv', path).group(1)
         content = pd.read_csv(path)
 
-        # print(self.title, 'loaded csv')
-        # print(content.head())
-
         self.x = self.X = list(content.index)
         self.y = self.Y = content.value
         self.status = self.STATUS = content.status
@@ -65,6 +62,13 @@ class DataStream:
 
     def get_status(self):
         return list(self.STATUS)[-1]
+
+class StatusViewer:
+
+    def __init__(self):
+        pass
+
+    
 
 # class CategoryStream(DataStream):
 #
