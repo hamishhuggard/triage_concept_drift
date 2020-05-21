@@ -5,6 +5,8 @@ import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 import re
+from dash_core_components import Link
+import dash_html_components as html
 
 class DataStream:
 
@@ -71,6 +73,9 @@ class DataStream:
     def get_status(self):
         return list(self.status)[-1]
 
+    def get_self_link(self):
+        return Link(self.title, href=f'#{self.id_}')
+
     def __cmp__(self, other):
 
         sstatus = self.get_status()
@@ -92,10 +97,36 @@ class DataStream:
         # Otherwise whichever has the higher priority integer
         return sstatus - ostatus
 
+    def __repr__(self):
+        return self.title
+
+    @staticmethod
+    def get_streams_by_status(stream_list, status):
+        ret = []
+        for stream in stream_list:
+            if stream.get_status() == status:
+                ret.append(stream)
+        return ret
+
 class AccuracyStream(DataStream):
+
+    acc_stream = []
 
     def __init__(self, path):
         super().__init__(path)
+        AccuracyStream.acc_stream = self
+
+    @staticmethod
+    def get_status_div():
+        # return html.Div('hello', style={'color': 'red'})#'color', '#7FDBFF'})
+        status = AccuracyStream.acc_stream.get_status()
+        if status == 'DRIFT':
+            return html.Div('Concept drift detected', style={'color': 'red'})
+        elif status == 'WARNING':
+            return html.Div('Concept drift suspected', style={'color': 'orange'})
+        else:
+            return html.Div('No concept drift', style={'color': 'green'})
+
 
 class FeatureStream(DataStream):
 
@@ -107,12 +138,70 @@ class FeatureStream(DataStream):
         super().__init__(path)
         self.register()
 
+    @staticmethod
+    def get_status_div():
+        stream_list = FeatureStream.streams
+        drift = DataStream.get_streams_by_status(stream_list, 'DRIFT')
+        warning = DataStream.get_streams_by_status(stream_list, 'WARNING')
+        if len(drift)==0 and len(warning)==0:
+            return html.Div('No feature drift.', style={'color': 'green'})
+        children = []
+        if len(warning) > 0:
+            children.append(
+                html.Div(
+                    'Suspected feature drift on: ' + \
+                    ', '.join(stream.title for stream in warning),
+                    style={'color': 'orange'}
+                )
+            )
+        if len(drift) > 0:
+            children.append(
+                html.Div(
+                    'Feature drift on: ' + \
+                    ', '.join(stream.title for stream in drift),
+                    style={'color': 'red'}
+                )
+            )
+        return html.Div(children)
+
+
 class LabelStream(DataStream):
 
     streams = []
     def register(self):
         LabelStream.streams.append(self)
+        print('labelstream')
+        print(LabelStream.streams)
 
     def __init__(self, path):
         super().__init__(path)
         self.register()
+
+    @staticmethod
+    def get_status_div():
+        stream_list = LabelStream.streams
+        print('get')
+        print(stream_list)
+        drift = DataStream.get_streams_by_status(stream_list, 'DRIFT')
+        warning = DataStream.get_streams_by_status(stream_list, 'WARNING')
+        print(drift, warning)
+        if len(drift)==0 and len(warning)==0:
+            return html.Div('No label drift.', style={'color': 'green'})
+        children = []
+        if len(warning) > 0:
+            children.append(
+                html.Div(
+                    'Suspected label drift on: ' + \
+                    ', '.join(stream.title for stream in warning),
+                    style={'color': 'orange'}
+                )
+            )
+        if len(drift) > 0:
+            children.append(
+                html.Div(
+                    'Label drift on: ' + \
+                    ', '.join(stream.title for stream in drift),
+                    style={'color': 'red'}
+                )
+            )
+        return html.Div(children)

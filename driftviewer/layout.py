@@ -31,25 +31,25 @@ def get_layout(dir):
     ### LOADING DATA ###
     ####################
 
-    loss_path = os.path.join(dir, 'accuracy.csv')
-    loss_stream = DataStream(loss_path)
+    acc_path = os.path.join(dir, 'accuracy.csv')
+    acc_stream = AccuracyStream(acc_path)
 
     feature_streams = []
     for feature_path in sorted(list(glob(dir+'/features/*.csv'))):
-        feature_streams.append(DataStream(feature_path))
+        feature_streams.append(FeatureStream(feature_path))
     label_streams = []
     for label_path in sorted(list(glob(dir+'/predictions/*.csv'))):
-        label_streams.append(DataStream(label_path))
+        label_streams.append(LabelStream(label_path))
 
     #################
     ### LOGICS    ###
     #################
 
-    accuracy_truncator.connect_output(loss_stream)
+    accuracy_truncator.connect_output(acc_stream)
     feature_truncator.connect_outputs(feature_streams)
     label_truncator.connect_outputs(label_streams)
 
-    smoother.connect_output(loss_stream)
+    smoother.connect_output(acc_stream)
     smoother.connect_outputs(label_streams)
     smoother.connect_outputs(feature_streams)
 
@@ -57,11 +57,11 @@ def get_layout(dir):
     ### LAYOUT ###
     ##############
 
-    accuracy_tab = dcc.Tab(loss_stream.get_plot(), label='Accuracy')
+    accuracy_tab = dcc.Tab(acc_stream.get_plot(), label='Accuracy', id='accuracy-tab')
 
-    label_tab = dcc.Tab(get_plots(label_streams), label='Labels')
+    label_tab = dcc.Tab(get_plots(label_streams), label='Labels', id='label-tab')
 
-    feature_tab = dcc.Tab(get_plots(feature_streams), label='Features')
+    feature_tab = dcc.Tab(get_plots(feature_streams), label='Features', id='feature-tab')
 
     tabs = dcc.Tabs(
         [accuracy_tab, label_tab, feature_tab],
@@ -77,6 +77,8 @@ def get_layout(dir):
     return html.Div([
         html.Div([
             html.H1('Multiple Drift Detector', style={'margin': '48px 0'}),
+            html.Div(id='status'),
+            html.Br(),
             html.Div(
                 [
                     truncating_panel,

@@ -110,6 +110,9 @@ class CallBackLogic:
     @staticmethod
     def get_outputs():
         return [
+            Output(component_id='status', component_property='children')
+        ] + \
+        [
             Output(component_id=id, component_property='figure')
             for id in CallBackLogic.outputs.keys()
         ]
@@ -124,6 +127,13 @@ class CallBackLogic:
     @staticmethod
     def get_return():
         return [
+            html.Div([
+                AccuracyStream.get_status_div(),
+                FeatureStream.get_status_div(),
+                LabelStream.get_status_div()
+            ])
+        ] + \
+        [
             stream.get_figure() for stream in CallBackLogic.outputs.values()
         ]
 
@@ -175,72 +185,6 @@ class ControlPanel(html.Div): # , CallBackLogic
             style={'margin': '0 auto', 'border-radius': '10px',
                 'background-color': '#CCC', 'width': '95%'} # 'width': '90%',
         )
-
-
-###################################################
-### DATA READER                                 ###
-###################################################
-
-class StreamReader:
-
-    '''
-    Given a directory with three csvs:
-     * bow_features.csv
-        * each column represents a token. The values are Boolean and indicate
-        whether that token occurred in that document.
-     * cat_features.csv
-        * each column represents a categorical feature. The values are strings
-        of the category the instance belongs to.
-     * Maybe in the future: num_features.csv, bool_features.csv
-     * predictions.csv
-        * one column giving the predictions of the model
-     * labels.csv
-        * only one column giving the true labels
-
-    StreamReader extracts the data from each of these csvs and creates DataStream objects.
-    Within the DataStream constructor, drift statuses will be calculated.
-    '''
-
-    def __init__(self, title=''):
-        self.dirname = os.path.abspath(f'../Tornado/data_streams/new_concept')
-
-    def parse_cat_datastream(self, stream):
-        # get unique values
-        unique = list(unique)
-
-    def load_all_data(self):
-        self.bow_features = pd.read_csv(dirname + '/bow_features.csv')
-        self.cat_features = pd.read_csv(dirname + '/cat_features.csv')
-        self.predicitons = pd.read_csv(dirname + '/predictions.csv')
-        self.labels = pd.read_csv(dirname + '/labels.csv')
-
-    def get_features(self):
-        data = pd.read_csv(dirname + '/test.csv')
-    def get_labels(self):
-        with open(dirname + '/y.json', 'r') as f:
-            y = json.loads(f.read())
-        for i in range(1, 6): # range of possible triage labels
-            pass
-
-    def get_accuracy(self):
-        # status_data = pd.read_csv(dirname + '/status_data.csv')
-        err_data = pd.read_csv(self.dirname + '/err_data.csv')
-        errs = err_data['ERRS']
-        status = err_data['STATUS']
-        # p = err_data['']
-        ds =  DataStream(x=np.arange(len(errs)), y=errs, title='Error Rate', status=status)
-        return ds
-
-class StreamReader(CallBackLogic, html.Div):
-
-    def __init__(self, title=''):
-
-        dropdown_opts = [ {'label': i, 'value': i} for i in Smoother.SMOOTH_SHAPES ]
-        self.dropdown = DropDownItem(options=dropdown_opts, value='hanning')
-
-        CallBackLogic.__init__(self)
-        html.Div.__init__(self, [html.H5(title), self.slider])
-        self.connect_input(self.slider)
 
 ###################################################
 ### CONTROLS                                    ###
