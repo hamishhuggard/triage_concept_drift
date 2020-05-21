@@ -74,7 +74,7 @@ class DataStream:
         return list(self.status)[-1]
 
     def get_self_link(self):
-        return Link(self.title, href=f'#{self.id_}')
+        return html.A(self.title+' ', href=f'#{self.id_}')
 
     def __cmp__(self, other):
 
@@ -165,16 +165,16 @@ class FeatureStream(DataStream):
         if len(warning) > 0:
             children.append(
                 html.Div(
-                    'Suspected feature drift on: ' + \
-                    ', '.join(stream.title for stream in warning),
+                    ['Suspected feature drift on: '] + \
+                    [ stream.get_self_link() for stream in warning ],
                     style={'color': 'orange'}
                 )
             )
         if len(drift) > 0:
             children.append(
                 html.Div(
-                    'Feature drift on: ' + \
-                    ', '.join(stream.title for stream in drift),
+                    ['Feature drift on: '] + \
+                    [ stream.get_self_link() for stream in drift ],
                     style={'color': 'red'}
                 )
             )
@@ -214,16 +214,16 @@ class LabelStream(DataStream):
         if len(warning) > 0:
             children.append(
                 html.Div(
-                    'Suspected label drift on: ' + \
-                    ', '.join(stream.title for stream in warning),
+                    ['Suspected label drift on: '] + \
+                    [ stream.get_self_link() for stream in warning ],
                     style={'color': 'orange'}
                 )
             )
         if len(drift) > 0:
             children.append(
                 html.Div(
-                    'Label drift on: ' + \
-                    ', '.join(stream.title for stream in drift),
+                    ['Label drift on: '] + \
+                    [ stream.get_self_link() for stream in drift ],
                     style={'color': 'red'}
                 )
             )
