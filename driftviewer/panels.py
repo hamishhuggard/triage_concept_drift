@@ -257,25 +257,25 @@ class Smoother(CallBackLogic, html.Div):
 
         self.slider = PercentSlider(20)
 
-        dropdown_opts = [ {'label': i, 'value': i} for i in Smoother.SMOOTH_SHAPES ]
-        self.dropdown = DropDownItem(options=dropdown_opts, value='hanning')
+        # dropdown_opts = [ {'label': i, 'value': i} for i in Smoother.SMOOTH_SHAPES ]
+        # self.dropdown = DropDownItem(options=dropdown_opts, value='hanning')
 
         CallBackLogic.__init__(self)
 
         html.Div.__init__(
             self,
             [
-                html.H5('Smoothing Kernel'),
-                self.dropdown,
+                # html.H5('Smoothing Kernel'),
+                # self.dropdown,
                 html.H5('Smoothness'),
                 self.slider
             ]
         )
 
-        self.connect_inputs([self.slider, self.dropdown])
+        self.connect_inputs([self.slider])#, self.dropdown])
 
     def update_output(self, output):
         y = output.y
         win_width = self.slider.value
-        win_shape = self.dropdown.value
+        win_shape = 'hanning' #self.dropdown.value
         output.y = Smoother.smooth(y, win_width, win_shape)
