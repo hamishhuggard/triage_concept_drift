@@ -77,10 +77,10 @@ def get_layout(dir):
     return html.Div([
         html.Div([
             html.H1('Multiple Drift Detector', style={'margin': '48px 0'}),
-            html.Div(id='status'),
-            html.Br(),
             html.Div(
                 [
+                    ControlPanel('Status', html.Div(id='status')),
+                    html.Br(),
                     truncating_panel,
                     html.Br(),
                     smoothing_panel
