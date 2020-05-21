@@ -119,25 +119,22 @@ On the right we have three tabs:
 
 ## TODO
 
-General:
- * Make sure notebook still works with name changes
-
 MultiDriftDetector:
+ * Handle Bonferonni corrections properly
  * Restoring from interrupt
- * Incorporate CDDM
- * Incorporate Bayes
  * Handling freetext
  * Handling categorical
  * Handling numeric
- * Paginating features
- * Handle Bonferonni corrections properly
+ * Incorporate CDDM
+ * Incorporate Bayes
 
 README:
  * Describe the contents of the repository
  * Talk about the choice of underlying drift detector
 
 Dash app:
- * Add comments explaining how everything works
+ * Expand documentation
+ * Paginate feature plots
 
 <!--
 
