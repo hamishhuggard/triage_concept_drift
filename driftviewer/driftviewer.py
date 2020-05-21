@@ -23,4 +23,4 @@ if __name__ == '__main__':
         CallBackLogic.update(*args)
         return CallBackLogic.get_return()
 
-    app.run_server(debug=True)
+    app.run_server(debug=False)
