@@ -22,7 +22,7 @@ class DataStream:
         content = pd.read_csv(path)
 
         self.x = self.X = list(content.index)
-        self.y = self.Y = content.value
+        self.y = self.Y = np.array(content.value, dtype='float32')
         self.status = self.STATUS = content.status
         self.description = self.DESCRIPTION = content.description
 

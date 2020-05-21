@@ -50,7 +50,7 @@ This allows the drift detector to be restored if it is interrupted, and also all
 
 Step 3. Create a `MultiDriftDetector` object.
 ```
->>> detector = triage_detector.triage_detector.MultiDriftDetector(
+>>> detector = multidriftdetector.MultiDriftDetector(
     write_dir = write_dir,
     drift_action = display_message
 )
@@ -112,10 +112,23 @@ On the right we have three tabs:
 
 ## TODO
 
- * Implement code in `MultiDriftDetector` for restoring from interrupt.
- * Differentiate concept drift detector from real drift detector?
- * In README, describe the contents of the repository
- * In README, talk about the choice of underlying drift detector.
+General:
+ * Make sure notebook still works with name changes
+
+MultiDriftDetector:
+ * Restoring from interrupt
+ * Incorporate CDDM
+ * Incorporate Bayes
+ * Handling freetext
+ * Handle Bonferonni corrections properly
+
+README:
+ * Describe the contents of the repository
+ * Talk about the choice of underlying drift detector
+
+Dash app:
+ * Central display of all drifting streams
+ * Add comments explaining how everything works
 
 <!--
 

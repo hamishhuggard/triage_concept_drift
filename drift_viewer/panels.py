@@ -297,22 +297,32 @@ class Smoother(CallBackLogic, html.Div):
         This code is based on http://www.scipy.org/Cookbook/SignalSmooth
         '''
         # Convert win_width from percentage to absolute
-        # win_width = int(len(x) * win_width / 800)
-        x = np.array(x, dtype='int')
+        win_width = int(len(x) * win_width / 100)
+
+        # Window widths this small can cause problems
         if win_width < 3:
             return x
+
+        # Can't smooth an empty array
         if len(x) == 0:
             return []
-        s = np.r_[x[win_width-1::-1], x,
-                    x[-1:-win_width:-1]]
-        if win_shape == 'flat': #moving average
-                w=np.ones(win_width,'d')
+
+        # Having a window width longer than the length of x reduces x's length
+        if win_width > len(x):
+            win_width = len(x)
+
+        # Pad x so that convolutional window will reflect off the edges
+        s = np.r_[x[::-1][-win_width:], x,
+                    x[::-1][:win_width]]
+
+        # Array to convolve with
+        if win_shape == 'flat':
+            w=np.ones(win_width,'d')
         else:
-                w=eval('np.'+win_shape+'(win_width)')
+            w=eval('np.'+win_shape+'(win_width)')
+
         y=np.convolve(w/w.sum(), s, mode='same')
-        return y[win_width:-win_width+1]
-        # y = np.convolve(w/w.sum(), x, mode='same')
-        return y
+        return y[win_width:-win_width]
 
     def __init__(self, title="Curve Smoothing"):
 
@@ -339,4 +349,4 @@ class Smoother(CallBackLogic, html.Div):
         y = output.y
         win_width = self.slider.value
         win_shape = self.dropdown.value
-        output.y = Smoother.smooth(y, win_width*2, win_shape)
+        output.y = Smoother.smooth(y, win_width, win_shape)
