@@ -28,7 +28,14 @@ Step 3. Activate the environment.
 (base)$ conda activate triage_drift_env
 ```
 
-Step 4. (Optional) If you want to use this environment in any notebooks, you will need to have `nb_conda_kernels` installed in the base environment. This will be necessary, for example, if you want to run [demo.ipynb](demo.ipynb).
+Step 4. You may have to install the current module, as well as the modified Tornado submodule. I'm not sure if this is included in the `env.yml` file or not.
+```
+(triage_drift_env)$ pip install .
+(triage_drift_env)$ cd tornado_mod
+(triage_drift_env)$ pip install .
+```
+
+Step 5. (Optional) If you want to use this environment in any notebooks, you will need to have `nb_conda_kernels` installed in the base environment. This will be necessary, for example, if you want to run [demo.ipynb](demo.ipynb).
 ```
 (triage_drift_env)$ conda deactivate
 (base)$ conda install nb_conda_kernels
@@ -107,7 +114,7 @@ On the left we have two control panels:
 
 On the right we have three tabs:
  * __Accuracy tab__ shows how the accuracy is evolving over time.
- * __Labels tab__ shows how the rate of each of the labels is evolving over time.
+ * __Labels tab__ shows how the rate of each of the labels is evolving over time. Note that these are the labels _as predicted by the model_, not the _gold standard_ labels. Often the gold standard labels arrive later than the predicted labels, so we can get an earlier warning of label drift this way.
  * __Features tab__ shows how the values of each of the features are evolving over time. In the case of free text, it shows how the frequency of different tokens are evolving over time.
 
 ## TODO

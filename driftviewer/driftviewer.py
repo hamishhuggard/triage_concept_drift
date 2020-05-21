@@ -5,13 +5,13 @@ import dash
 
 if __name__ == '__main__':
 
+    app = dash.Dash()
+
+    # Layout
     if len(sys.argv) != 2:
         raise ValueError('There should be one command line arguments specifying the location of the drift detector status directory.')
     dir = sys.argv[1]
 
-    app = dash.Dash()
-
-    # Layout
     app.layout = get_layout(dir)
 
     # Callbacks

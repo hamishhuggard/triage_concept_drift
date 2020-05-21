@@ -40,10 +40,14 @@ class DataStream:
         return figure
 
     def get_data(self):
-        marker = {}#'label': self.X}
+
+        # Color the scatter points by their drift status
+        marker = {}
         color_dict = {'DRIFT': 'red', 'WARNING': 'orange', 'NORMAL': 'green'}
         if len(self.status) > 0:
             marker['color'] = [ color_dict[s] for s in self.status ]
+
+        # The hovertext for each scatter point
         text = [
             'Value: ' + str(int(a)) + \
             '<br>Drift Status: ' + b + \
@@ -51,6 +55,7 @@ class DataStream:
             '<extra></extra>' # This suppresses some extra text that says "trace-1"
             for a,b,c in zip(self.Y, self.STATUS, self.DESCRIPTION)
         ]
+
         return [
             go.Scatter(
                 x=self.x,
@@ -66,65 +71,48 @@ class DataStream:
     def get_status(self):
         return list(self.status)[-1]
 
-class StatusViewer:
+    def __cmp__(self, other):
 
-    def __init__(self):
-        pass
+        sstatus = self.get_status()
+        ostatus = other.get_status()
 
+        # Convert these to priority integers
+        status2int = {
+            'DRIFT': 2,
+            'WARNING': 1,
+            'NORMAL': 0
+        }
+        sstatus = status2drift[sstatus]
+        ostatus = status2drift[ostatus]
 
+        # If they have the same status then use alphabetic order with titles
+        if sstatus == ostatus:
+            return self.title.__cmp__(other.title)
 
-# class CategoryStream(DataStream):
-#
-#     def __init__(self, title, streams):
-#         self.streams = streams
-#         super().__init__(self, title=title)
-#
-#     def get_data(self):
-#         data = []
-#         for stream in self.streams:
-#             stream_scatter = [
-#                 go.Scatter(
-#                     x=stream.x,
-#                     y=stream.y,
-#                     mode='lines',
-#                     name=stream.title,
-#                     stackgroup='one'
-#                 )
-#             ]
-#             data.extend(stream_scatter)
-#         return data
-#
+        # Otherwise whichever has the higher priority integer
+        return sstatus - ostatus
 
+class AccuracyStream(DataStream):
 
-# class MultiStreamPlot(html.Div):
-#
-#     '''
-#     Takes care of pagination and sorting by driftiness.
-#     '''
-#
-#     def __init__(self, x, ys, id, title):
-#         '''
-#         x is a list of x values
-#         ys is a dictionary {category_value: y_values}
-#         '''
-#         self.id = id
-#         self.title = title
-#         self.x = x
-#         self.ys = ys
-#         self.plots = [ DataStream(x, y, id=val, title=val) for (val, y) in ys.items() ]
-#         super().__init__(
-#             [
-#                 html.H2(title),
-#                 html.Br(),
-#             ] + self.plots
-#         )
-#
-# class CategoryPlots(MultiStreamPlot):
-#
-#     def __init__(self, x, ys, id, title):
-#         '''
-#         x is a list of x values
-#         ys is a dictionary {category_value: y_values}
-#         '''
-#         super().__init__(x, ys, id, title)
-#         self.plots += CategoryPlot(self.plots)
+    def __init__(self, path):
+        super().__init__(path)
+
+class FeatureStream(DataStream):
+
+    streams = []
+    def register(self):
+        FeatureStream.streams.append(self)
+
+    def __init__(self, path):
+        super().__init__(path)
+        self.register()
+
+class LabelStream(DataStream):
+
+    streams = []
+    def register(self):
+        LabelStream.streams.append(self)
+
+    def __init__(self, path):
+        super().__init__(path)
+        self.register()

@@ -1,18 +1,12 @@
-# from bow_machine import BOWMachine
-
-# I don't know how to do this properly
 import sys
 import os
-tornado_path = os.path.abspath('./tornado_med')
-sys.path.insert(0, tornado_path)
-from tornado_med.drift_detection.__init__ import *
-
 from collections import defaultdict
 import os
 from wasabi import color, Printer
 import numpy as np
 from copy import copy
-from datastream import DataStream
+from multidriftdetector.datastream import DataStream
+from tornado_mod.drift_detection.__init__ import *
 
 class MultiDriftDetector:
 
@@ -55,7 +49,7 @@ class MultiDriftDetector:
             drift_action = self.drift_action,
             detector = copy(MultiDriftDetector.concept_dd),
             name = 'Concept Drift',
-            bidirection=False # only detect increases in loss
+            bidirectional=False # only detect increases in loss
         )
 
         # The prediction queue for matching predictions with labels

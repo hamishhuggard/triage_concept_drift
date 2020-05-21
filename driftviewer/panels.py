@@ -242,27 +242,6 @@ class StreamReader(CallBackLogic, html.Div):
         html.Div.__init__(self, [html.H5(title), self.slider])
         self.connect_input(self.slider)
 
-# def load_scenario(i):
-#     # path = os.path.abspath(f'./fake_data/scenario{i}.csv')
-#     # data = pd.read_csv(path)
-#     # data['date'] = data['date'].apply(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%S:%f'))
-#     dirname = os.path.abspath(f'../experiments/data_streams/scenarios/{i}/')
-#     data = pd.read_csv(dirname + '/test.csv')
-#     with open(dirname + '/y.json', 'r') as f:
-#         y = json.loads(f.read())
-#     with open(dirname + '/errs.json', 'r') as f:
-#         errs = json.loads(f.read())
-#     err_data = pd.read_csv(dirname + '/err_data.csv')
-#     status_data = pd.read_csv(dirname + '/status_data.csv')
-#     for i in [1,2,3,4,5]:
-#         data[f'label={i}'] = [ label==i for label in y ]
-#     data['error_rate'] = errs
-#     data['date'] = list(range(len(data)))
-#     # data['err_data'] = err_data
-#     data = data.join(err_data)
-#     data = data.join(status_data)
-#     return data
-
 ###################################################
 ### CONTROLS                                    ###
 ###################################################
