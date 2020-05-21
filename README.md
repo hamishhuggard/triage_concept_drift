@@ -137,7 +137,6 @@ README:
  * Talk about the choice of underlying drift detector
 
 Dash app:
- * Central display of all drifting streams
  * Add comments explaining how everything works
 
 <!--

@@ -8,25 +8,6 @@ def get_plots(streams):
 
 def get_layout(dir):
 
-    ######################
-    ### CONTROL PANELS ###
-    ######################
-
-    # Truncation panel
-    accuracy_truncator = Truncator("Accuracy Truncation (%)")
-    feature_truncator = Truncator("Features Truncation (%)")
-    label_truncator = Truncator("Labels Truncation (%)")
-
-    truncating_panel = ControlPanel(
-        "Truncate Data Streams",
-        [accuracy_truncator, label_truncator, feature_truncator]
-    )
-
-    # Smoothing panel
-
-    smoother = Smoother()
-    smoothing_panel = ControlPanel("Smoothing", [smoother])
-
     ####################
     ### LOADING DATA ###
     ####################
@@ -40,6 +21,24 @@ def get_layout(dir):
     label_streams = []
     for label_path in sorted(list(glob(dir+'/predictions/*.csv'))):
         label_streams.append(LabelStream(label_path))
+
+    ######################
+    ### CONTROL PANELS ###
+    ######################
+
+    # Truncation panel
+    accuracy_truncator = Truncator("Accuracy Truncation", max_val=len(acc_stream.x))
+    feature_truncator = Truncator("Features Truncation", max_val=len(feature_streams[0].x))
+    label_truncator = Truncator("Labels Truncation", max_val=len(label_streams[0].x))
+
+    truncating_panel = ControlPanel(
+        "Truncate Data Streams",
+        [accuracy_truncator, label_truncator, feature_truncator]
+    )
+
+    # Smoothing panel
+    smoother = Smoother()
+    smoothing_panel = ControlPanel("Smoothing", [smoother])
 
     #################
     ### LOGICS    ###

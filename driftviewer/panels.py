@@ -53,14 +53,14 @@ class PercentSlider(PanelItem, dcc.Slider):
     A slider from 0 to 100.
     '''
 
-    def __init__(self, value=100):
+    def __init__(self, value=100, max_val=100):
 
         dcc.Slider.__init__(
             self,
             id=self.get_id(),
             min=0,
-            max=100,
-            marks={i: str(i) for i in range(101) if i % 100 == 0 },
+            max=max_val,
+            marks={i: str(i) for i in range(max_val+1) if i % max_val == 0 },
             value=value
         )
         self.value = value
@@ -198,8 +198,8 @@ class ControlPanel(html.Div): # , CallBackLogic
 
 class Truncator(CallBackLogic, html.Div):
 
-    def __init__(self, title=''):
-        self.slider = PercentSlider(value=100)
+    def __init__(self, title='', max_val=100):
+        self.slider = PercentSlider(value=max_val, max_val=max_val)
         CallBackLogic.__init__(self)
         html.Div.__init__(self, [html.H5(title), self.slider])
         self.connect_input(self.slider)
@@ -207,8 +207,8 @@ class Truncator(CallBackLogic, html.Div):
     def update_output(self, output):
         upto = self.slider.value
         # convert upto from percentage to index
-        stream_len = len(output.X)
-        upto = int( stream_len * upto / 100 )
+        # stream_len = len(output.X)
+        # upto = int( stream_len * upto / 100 )
         # truncate x and y values
         output.x = output.X[:upto]
         output.y = output.Y[:upto]
