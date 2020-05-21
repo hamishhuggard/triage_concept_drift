@@ -120,6 +120,9 @@ MultiDriftDetector:
  * Incorporate CDDM
  * Incorporate Bayes
  * Handling freetext
+ * Handling categorical
+ * Handling numeric
+ * Paginating features
  * Handle Bonferonni corrections properly
 
 README:
