@@ -110,7 +110,10 @@ class CallBackLogic:
     @staticmethod
     def get_outputs():
         return [
-            Output(component_id='status', component_property='children')
+            Output(component_id='status', component_property='children'),
+            Output(component_id='acc-status', component_property='children'),
+            Output(component_id='label-status', component_property='children'),
+            Output(component_id='feature-status', component_property='children'),
         ] + \
         [
             Output(component_id=id, component_property='figure')
@@ -131,7 +134,10 @@ class CallBackLogic:
                 AccuracyStream.get_status_div(),
                 FeatureStream.get_status_div(),
                 LabelStream.get_status_div()
-            ])
+            ]),
+            AccuracyStream.get_long_status_div(),
+            LabelStream.get_long_status_div(),
+            FeatureStream.get_long_status_div(),
         ] + \
         [
             stream.get_figure() for stream in CallBackLogic.outputs.values()

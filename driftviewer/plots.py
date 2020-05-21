@@ -117,6 +117,10 @@ class AccuracyStream(DataStream):
         AccuracyStream.acc_stream = self
 
     @staticmethod
+    def get_long_status_div():
+        return ''
+
+    @staticmethod
     def get_status_div():
         # return html.Div('hello', style={'color': 'red'})#'color', '#7FDBFF'})
         status = AccuracyStream.acc_stream.get_status()
@@ -140,6 +144,18 @@ class FeatureStream(DataStream):
 
     @staticmethod
     def get_status_div():
+        stream_list = FeatureStream.streams
+        drift = DataStream.get_streams_by_status(stream_list, 'DRIFT')
+        warning = DataStream.get_streams_by_status(stream_list, 'WARNING')
+        if len(drift) > 0:
+            return html.Div('Feature drift detected.', style={'color': 'red'})
+        elif len(warning) > 0:
+            return  html.Div('Feature drift suspected.', style={'color': 'orange'})
+        else:
+            return html.Div('No feature drift.', style={'color': 'green'})
+
+    @staticmethod
+    def get_long_status_div():
         stream_list = FeatureStream.streams
         drift = DataStream.get_streams_by_status(stream_list, 'DRIFT')
         warning = DataStream.get_streams_by_status(stream_list, 'WARNING')
@@ -170,8 +186,6 @@ class LabelStream(DataStream):
     streams = []
     def register(self):
         LabelStream.streams.append(self)
-        print('labelstream')
-        print(LabelStream.streams)
 
     def __init__(self, path):
         super().__init__(path)
@@ -180,11 +194,20 @@ class LabelStream(DataStream):
     @staticmethod
     def get_status_div():
         stream_list = LabelStream.streams
-        print('get')
-        print(stream_list)
         drift = DataStream.get_streams_by_status(stream_list, 'DRIFT')
         warning = DataStream.get_streams_by_status(stream_list, 'WARNING')
-        print(drift, warning)
+        if len(drift) > 0:
+            return html.Div('Label drift detected.', style={'color': 'red'})
+        elif len(warning) > 0:
+            return  html.Div('Label drift suspected.', style={'color': 'orange'})
+        else:
+            return html.Div('No label drift.', style={'color': 'green'})
+
+    @staticmethod
+    def get_long_status_div():
+        stream_list = LabelStream.streams
+        drift = DataStream.get_streams_by_status(stream_list, 'DRIFT')
+        warning = DataStream.get_streams_by_status(stream_list, 'WARNING')
         if len(drift)==0 and len(warning)==0:
             return html.Div('No label drift.', style={'color': 'green'})
         children = []

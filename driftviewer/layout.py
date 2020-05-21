@@ -57,11 +57,11 @@ def get_layout(dir):
     ### LAYOUT ###
     ##############
 
-    accuracy_tab = dcc.Tab(acc_stream.get_plot(), label='Accuracy', id='accuracy-tab')
+    accuracy_tab = dcc.Tab([html.Div(id='acc-status'), acc_stream.get_plot()], label='Accuracy', id='accuracy-tab')
 
-    label_tab = dcc.Tab(get_plots(label_streams), label='Labels', id='label-tab')
+    label_tab = dcc.Tab([html.Div(id='label-status')] + get_plots(label_streams), label='Labels', id='label-tab')
 
-    feature_tab = dcc.Tab(get_plots(feature_streams), label='Features', id='feature-tab')
+    feature_tab = dcc.Tab([html.Div(id='feature-status')] + get_plots(feature_streams), label='Features', id='feature-tab')
 
     tabs = dcc.Tabs(
         [accuracy_tab, label_tab, feature_tab],
@@ -81,9 +81,9 @@ def get_layout(dir):
                 [
                     ControlPanel('Status', html.Div(id='status')),
                     html.Br(),
-                    truncating_panel,
+                    smoothing_panel,
                     html.Br(),
-                    smoothing_panel
+                    truncating_panel,
                 ],
                 style={'float': 'left', 'width': '30%'}
             ),
