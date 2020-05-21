@@ -95,7 +95,7 @@ After the drift detector has run, you can visualise the evolution of the data st
 The app is run as follows, where the argument is the directory that the drift detector was writing its status to.
 ```
 (triage_drift_env)$ cd driftviewer
-(triage_drift_env)$ python app.py ../data/demo
+(triage_drift_env)$ python driftviewer.py ../data/demo
 ```
 If you open `http://127.0.0.1:8050/` in a browser, you should see the following screen:
 
