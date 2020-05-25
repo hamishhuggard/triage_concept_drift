@@ -28,9 +28,17 @@ Step 3. Activate the environment.
 (base)$ conda activate triage_drift_env
 ```
 
-Step 4. You may have to install the current module, as well as the modified Tornado submodule. I'm not sure if this is included in the `env.yml` file or not.
+Step 4. You may have to install the current module, as well as the modified Tornado submodule.
 ```
 (triage_drift_env)$ pip install .
+(triage_drift_env)$ cd tornado_mod
+(triage_drift_env)$ pip install .
+```
+
+Step 4b. If the above didn't work, try this:
+```
+(triage_drift_env)$ rm -rm tornado_mod
+(triage_drift_env)$ git clone https://github.com/precisiondrivenhealth/tornado_mod.git
 (triage_drift_env)$ cd tornado_mod
 (triage_drift_env)$ pip install .
 ```
@@ -123,20 +131,27 @@ On the right we have three tabs:
 MultiDriftDetector:
  * Handle Bonferonni corrections properly
  * Restoring from interrupt
+ * Switch from accuracy to precision and recall
+
+FeaturePreprocessor:
+ * Create it
  * Handling freetext
  * Handling categorical
  * Handling numeric
- * Incorporate CDDM
- * Incorporate Bayes
 
 README:
  * Describe the contents of the repository
  * Talk about the choice of underlying drift detector
 
 Dash app:
+ * Don't hard code the contents of the dir. Read it from subdir names.
  * I think this crashes when 100% truncate accuracy.
  * Expand documentation
  * Paginate feature plots
+
+Stretch goals:
+  * Incorporate CDDM
+  * Incorporate Bayes
 
 <!--
 
