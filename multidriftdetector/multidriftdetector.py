@@ -25,24 +25,43 @@ class MultiDriftDetector:
 
     def __init__(
             self,
-            write_dir, # the directory to write the state of the detector
-            drift_action=print # the action to take if drift is detected
+            write_dir,
+            drift_action=print
+            drift_detector=HDDM_A_test,
+            warning_confidence=0.01,
+            drift_confidence=0.005,
         ):
+        '''
+        args:
+        - write_dir: the directory to write the state of the detector
+        - drift_action: the action to take if drift is detected
+        - drift_detector: a SuperDetector object for detecting changes in a data stream
+        - warning_confidence: the p-value of the no-drift hypothesis at which a drift warning is sent
+        - drift_confidence: the p-value of the no-drift hypothesis at which a drift signal is sent
+        '''
+
+        # only hddm uses drift_confidence and warning_confidence
+        # adwin, cusum, fhddm, fhddms, mddm, page_hinkey, seq_drift2 use delta
 
         self.write_dir = write_dir
         self.drift_action = drift_action
+        self.drift_detector = drift_detector
+        self.warning_confidence = warning_confidence
+        self.drift_confidence = drift_confidence
 
         # Set up the directory for recording detector state
         root = self.root_dir = os.path.abspath(write_dir)
         fdir = self.feature_dir = os.path.join(root, 'features')
         pdir = self.predictions_dir = os.path.join(root, 'predictions')
-        if not os.path.exists(fdir):
-            os.makedirs(fdir)
-        if not os.path.exists(pdir):
-            os.makedirs(pdir)
+        adir = self.accuracy_dir = os.path.join(root, 'accuracy')
+        prec_dir = self.precision_dir = os.path.join(root, 'precision')
+        rec_dir = self.recall_dir = os.path.join(root, 'recall')
+        for xdir in [fdir, pdir, adir, prec_dir, rec_dir]:
+            if not os.path.exists(xdir):
+                os.makedirs(xdir)
 
         # Create the record of model loss
-        self.loss_file = os.path.join(root, 'accuracy.csv')
+        self.loss_file = os.path.join(adir, 'accuracy.csv')
         with open(self.loss_file, 'w') as f:
             f.write('value,status,description\n')
         self.loss_stream = DataStream(

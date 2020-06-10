@@ -31,8 +31,8 @@ class BOWMachine:
             lowercase=True, # convert to lowercase
             stop_words='english', # remove English stopwords
             binary=False, # use counts rather than binary inclusion
-            max_df=0.99, # ignore tokens which occur more than 99% of documents
-            min_df=0.01, # ignore tokens which occur in fewer than 1% documents
+            max_df=0.95, # ignore tokens which occur more than 99% of documents
+            min_df=0.05, # ignore tokens which occur in fewer than 1% documents
             token_pattern='[A-Za-z]+' # only use pure-alphabetic tokens (no numeric chars)
         )
 

@@ -168,7 +168,7 @@ def parse_trial(trial_path):
 
 def parse_trials(experiment_dir):
     results = pd.DataFrame(columns=['Dataset', 'Detector', 'Model', 'TP', 'FN', 'FP', 'Err-rate', 'Memory', 'Runtime', 'Total Delay'])
-    for path in glob(f'./{experiment_dir}/*/*/*.txt'):
+    for path in glob(f'./{experiment_dir}/*/*/*/*.txt'):#f'./{experiment_dir}/*/*/*.txt'):
         results = results.append(parse_trial(path))
     return results
 
