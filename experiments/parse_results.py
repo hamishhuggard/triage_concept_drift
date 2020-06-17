@@ -125,7 +125,8 @@ def extend_metrics(results):
 ### Process results ###
 #######################
 
-def process_results(results, groupby='Detector', path=None, bold_best=False, alpha=0.05):
+def process_results(results, groupby='Detector', latex_path=None, fig_path=None,
+        bold_best=False, alpha=0.05, one_fig=True, cd_diagram=True):
     '''
     args:
         results (dataframe): table of results.
@@ -137,8 +138,8 @@ def process_results(results, groupby='Detector', path=None, bold_best=False, alp
     results_summary = full_results.agg(lambda x: f'{np.mean(x):.2f} ({np.std(x):.2f})')
 
     ## Embolden the best values for each column ##
+    results_means = full_results.mean()
     if bold_best:
-        results_means = full_results.mean()
         for col in results_means.columns:
             if col==groupby or col in groupby or col=='dataset_name':
                 continue
@@ -187,11 +188,26 @@ def process_results(results, groupby='Detector', path=None, bold_best=False, alp
         results_latex = results_latex.replace(before, after)
 
     # Write the LaTeX table to disk
-    if path:
-        with open(os.path.abspath(path)+'.csv', 'w') as f:
+    if latex_path:
+        with open(os.path.abspath(latex_path)+'.csv', 'w') as f:
             f.write(results_latex)
+            print('Writing LaTeX table to', latex_path)
 
     ## CD DIAGRAMS ##
+    if not cd_diagram:
+        return results_latex
+    if one_fig:
+        nfigs = len(results_summary.columns)# if results not in ['Detector', 'dataset_name'])
+        nfigs = nfigs+1 if nfigs%2==0 else nfigs
+        nrows = nfigs // 2
+        ncols = 2
+        fig_i = 1
+        width=9
+        height=3
+        fig = plt.figure(figsize=(width*2+1, height*nrows+1))
+        fig.set_facecolor('white')
+    # change names of detectors according to before_after dictionary
+    results.loc[:, 'Detector'] = results.Detector.map(before_after).fillna(results['Detector'])
     for col in results_means.columns:
 
         # Figure out if the plot should be reversed or not
@@ -260,14 +276,22 @@ def process_results(results, groupby='Detector', path=None, bold_best=False, alp
         # maxv = average_vals.max()
 
         # Plot the cd diagram
+        if one_fig:
+            ax = fig.add_subplot(nrows, ncols, fig_i)
+            fig_i += 1
+        else:
+            ax = None
         graph_ranks(
             average_vals.values,
             average_vals.keys(),
             p_vals,
             cd=None,
             reverse=reverse,
-            width=9, textspace=1.5, labels=True,
+            textspace=1, labels=False,
             highv=highv, lowv=lowv,
+            ax=ax,
+            width=width,
+            height=height,
             # highv = int(maxv + (maxv-minv)*0.1),
             # lowv = int(minv - (maxv-minv)*0.1)
         )
@@ -276,9 +300,16 @@ def process_results(results, groupby='Detector', path=None, bold_best=False, alp
             'weight': 'normal',
             'size': 22,
         }
-        plt.title(col,fontdict=font, y=0.9, x=0.5)
-        fig_path = os.path.abspath(path)+f"-{col.replace(' ', '_')}.png"
-        plt.savefig(fig_path,bbox_inches='tight')
+        ax.set_title(col,fontdict=font, y=0.9, x=0.5)
+        if not one_fig:
+            # fig_path = os.path.abspath(path)+f"-{col.replace(' ', '_')}.pdf"
+            plt.savefig(fig_path,bbox_inches='tight')
+
+    if one_fig:
+        # fig_path = os.path.abspath(path)+".pdf"
+        # plt.show()
+        print('Writing cd diagrams to', fig_path)
+        plt.savefig(fig_path, bbox_inches='tight')
 
     return results_latex
 

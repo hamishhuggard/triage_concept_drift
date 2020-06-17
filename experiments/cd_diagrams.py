@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import matplotlib
 
-matplotlib.use('agg')
+# matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
 matplotlib.rcParams['font.family'] = 'sans-serif'
@@ -24,7 +24,7 @@ import networkx
 
 # inspired from orange3 https://docs.orange.biolab.si/3/data-mining-library/reference/evaluation.cd.html
 def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, highv=None,
-                width=6, textspace=1, reverse=False, filename=None, labels=False, **kwargs):
+                width=6, height=2, textspace=1, reverse=False, filename=None, labels=False, ax=None, **kwargs):
     """
     Draws a CD graph, which is used to display  the differences in methods'
     performance. See Janez Demsar, Statistical Comparisons of Classifiers over
@@ -54,7 +54,7 @@ def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, hig
     try:
         import matplotlib
         import matplotlib.pyplot as plt
-        from matplotlib.backends.backend_agg import FigureCanvasAgg
+        # from matplotlib.backends.backend_agg import FigureCanvasAgg
     except ImportError:
         raise ImportError("Function graph_ranks requires matplotlib.")
 
@@ -100,9 +100,9 @@ def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, hig
                 for b in mxrange(lr[1:]):
                     yield tuple([a] + list(b))
 
-    def print_figure(fig, *args, **kwargs):
-        canvas = FigureCanvasAgg(fig)
-        canvas.print_figure(*args, **kwargs)
+    # def print_figure(fig, *args, **kwargs):
+    #     canvas = FigureCanvasAgg(fig)
+    #     canvas.print_figure(*args, **kwargs)
 
     sums = avranks
 
@@ -130,17 +130,19 @@ def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, hig
             a = highv - rank
         return textspace + scalewidth / (highv - lowv) * a
 
-    distanceh = 0.25
+    distanceh = 0.5#0.25
 
     cline += distanceh
 
     # calculate height needed height of an image
     minnotsignificant = max(2 * 0.2, linesblank)
-    height = cline + ((k + 1) / 2) * 0.2 + minnotsignificant
+    if height==None:
+        height = cline + ((k + 1) / 2) * 0.2 + minnotsignificant
 
-    fig = plt.figure(figsize=(width, height))
-    fig.set_facecolor('white')
-    ax = fig.add_axes([0, 0, 1, 1])  # reverse y axis
+    if ax==None:
+        fig = plt.figure(figsize=(width, height))
+        fig.set_facecolor('white')
+        ax = fig.add_axes([0, 0, 1, 1])  # reverse y axis
     ax.set_axis_off()
 
     hf = 1. / height  # height factor
@@ -191,7 +193,7 @@ def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, hig
     def filter_names(name):
         return name
 
-    space_between_names = 0.24
+    space_between_names = 0.3# 0.24
 
     for i in range(math.ceil(k / 2)):
         chei = cline + minnotsignificant + i * space_between_names
@@ -201,7 +203,7 @@ def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, hig
              linewidth=linewidth)
         if labels:
             text(textspace + 0.3, chei - 0.075, format(ssums[i], '.4f'), ha="right", va="center", size=10)
-        text(textspace - 0.2, chei, filter_names(nnames[i]), ha="right", va="center", size=16)
+        text(textspace - 0.2, chei, filter_names(nnames[i]), ha="right", va="center", size=16) # size=16
 
     for i in range(math.ceil(k / 2), k):
         chei = cline + minnotsignificant + (k - i - 1) * space_between_names
