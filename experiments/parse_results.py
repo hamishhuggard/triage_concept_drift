@@ -106,9 +106,9 @@ def extend_metrics(results):
     additionally includes precision, recall, mean delay,
     true positive rate, and false positive rate.
     '''
-    tp = results['TP'].astype('float')
-    fp = results['FP'].astype('float')
-    fn = results['FN'].astype('float')
+    tp = results['TP'].astype('float') + 1
+    fp = results['FP'].astype('float') + 1
+    fn = results['FN'].astype('float') + 1
     prec = ( tp / (tp + fp) )
     prec = prec.map(lambda x: x if np.isfinite(x) else np.nan)
     rec = ( tp / (tp + fn) )
@@ -232,6 +232,9 @@ def process_results(results, groupby='Detector', latex_path=None, fig_path=None,
                 row.append(x)
             data.append(row)
         data = np.array(data)
+
+        # Replace all the NaNs in the data with zeros
+        data = np.nan_to_num(data)
 
         # Perform Nemenyi-Friedman test
         nem = sp.posthoc_nemenyi_friedman(data)
