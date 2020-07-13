@@ -1,0 +1,20 @@
+[Name, Avg. Error-rate, Drift Detector Stats, Avg. Total Memory, Avg. Total Runtime, Avg. Score]
+NAIVE BAYES + ADWIN:	0.2	[0, [0, 0], 0, 0]	24.18	74.14	0.47
+NAIVE BAYES + BWAF:	0.2	[0, [0, 0], 0, 0]	10.98	121.74	0.39
+NAIVE BAYES + CDDM:	0.2	[0, [0, 0], 0, 0]	16.97	43.2	0.52
+NAIVE BAYES + CUSUM:	0.2	[0, [0, 0], 0, 0]	10.84	27.77	0.55
+NAIVE BAYES + DDM:	0.2	[0, [0, 0], 0, 0]	10.82	29.14	0.54
+NAIVE BAYES + EDDM:	0.2	[0, [0, 0], 0, 0]	11.34	23.17	0.55
+NAIVE BAYES + EWMA:	0.2	[0, [0, 0], 0, 0]	10.9	31.52	0.54
+NAIVE BAYES + FHDDM:	0.2	[0, [0, 0], 0, 0]	11.64	26.48	0.55
+NAIVE BAYES + FHDDMS:	0.2	[0, [0, 0], 0, 0]	11.81	42.95	0.52
+NAIVE BAYES + FHDDMS.add:	0.31	[0, [0, 0], 1, 0]	11.23	24.37	0.32
+NAIVE BAYES + HDDM.A.test:	0.2	[0, [0, 0], 0, 0]	11.11	34.49	0.53
+NAIVE BAYES + HDDM.W.test:	0.2	[0, [0, 0], 0, 0]	12.38	41.04	0.52
+NAIVE BAYES + MDDM.A.100:	0.2	[0, [0, 0], 0, 0]	11.82	91.57	0.44
+NAIVE BAYES + MDDM.E.100:	0.2	[0, [0, 0], 0, 0]	11.81	61.66	0.49
+NAIVE BAYES + MDDM.G.100:	0.2	[0, [0, 0], 0, 0]	11.81	64.73	0.49
+NAIVE BAYES + NO_DETECTION:	0.2	[0, [0, 0], 0, 0]	10.31	21.43	0.56
+NAIVE BAYES + PageHinkley:	0.2	[0, [0, 0], 0, 0]	10.92	24.21	0.55
+NAIVE BAYES + RDDM:	0.2	[0, [0, 0], 0, 0]	70.75	31.84	0.54
+NAIVE BAYES + SeqDrift2:	0.2	[0, [0, 0], 0, 0]	13841.85	36.59	0.37

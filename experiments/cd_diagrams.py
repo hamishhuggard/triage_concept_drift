@@ -185,6 +185,8 @@ def graph_ranks(avranks, names, p_values, cd=None, cdmethod=None, lowv=None, hig
              linewidth=2)
 
     for a in range(lowv, highv + 1):
+        if a%2==0 and a!=0:
+            continue
         text(rankpos(a), cline - tick / 2 - 0.05, str(a),
              ha="center", va="bottom", size=16)
 

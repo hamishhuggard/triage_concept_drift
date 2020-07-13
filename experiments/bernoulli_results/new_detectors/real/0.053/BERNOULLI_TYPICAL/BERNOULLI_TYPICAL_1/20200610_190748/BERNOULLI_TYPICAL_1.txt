@@ -1,8 +1,0 @@
-[Name, Avg. Error-rate, Drift Detector Stats, Avg. Total Memory, Avg. Total Runtime, Avg. Score]
-HOEFFDING TREE + CDDM:	0.33	[250, [0, 0], 0, 1]	20.96	104.12	0.32
-NAIVE BAYES + BWAF:	0.33	[250, [0, 0], 0, 1]	10.89	63.79	0.45
-PERCEPTRON + BWAF:	1.9	[250, [0, 0], 0, 1]	7.94	54.34	0.33
-HOEFFDING TREE + BWAF:	0.33	[250, [0, 0], 0, 1]	18.16	52.69	0.36
-NAIVE BAYES + BDDM:	0.33	[250, [0, 0], 0, 1]	12.92	9051.06	0.27
-PERCEPTRON + BDDM:	1.6	[250, [0, 0], 0, 1]	9.99	9036.78	0.17
-HOEFFDING TREE + BDDM:	0.33	[250, [0, 0], 0, 1]	20.23	9042.52	0.17

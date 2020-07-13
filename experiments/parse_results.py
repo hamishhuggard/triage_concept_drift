@@ -112,8 +112,10 @@ def extend_metrics(results):
     prec = ( tp / (tp + fp) )
     prec = prec.map(lambda x: x if np.isfinite(x) else np.nan)
     rec = ( tp / (tp + fn) )
+    f1 = 2 * 1/(1/prec + 1/rec)
     results['Precision'] = prec
     results['Recall'] = rec
+    results['F1'] = f1
     n_positives = results['TP']+results['FN']
     total_delay = results['Total Delay'].astype('float')
     results['Mean Delay'] = total_delay / n_positives.astype('float')
@@ -143,7 +145,7 @@ def process_results(results, groupby='Detector', latex_path=None, fig_path=None,
         for col in results_means.columns:
             if col==groupby or col in groupby or col=='dataset_name':
                 continue
-            if col in ['Precision', 'Recall']:
+            if col in ['Precision', 'F1', 'Recall']:
                 idxbf = results_means[col].idxmax()
             elif col in ['Err-rate', 'Memory', 'Runtime', 'Mean Delay']:
                 idxbf = results_means[col].idxmin()
@@ -166,6 +168,12 @@ def process_results(results, groupby='Detector', latex_path=None, fig_path=None,
         'Runtime': 'Runtime (ms)',
         'Err-rate': 'Err-rate (\%)',
         'PageHinkley': 'PH',
+        'FHDDMS.add': 'FHDDMS$_{add}$',
+        'MDDM.A.100': 'MDDM$_A$',
+        'MDDM.E.100': 'MDDM$_E$',
+        'MDDM.G.100': 'MDDM$_G$',
+        'NO\_DETECTION': 'Null',
+        'NO_DETECTION': 'Null',
         'NAIVE BAYES': 'NB',
         'PERCEPTRON': 'PR',
         'HOEFFDING TREE': 'HT',
@@ -189,7 +197,7 @@ def process_results(results, groupby='Detector', latex_path=None, fig_path=None,
 
     # Write the LaTeX table to disk
     if latex_path:
-        with open(os.path.abspath(latex_path)+'.csv', 'w') as f:
+        with open(os.path.abspath(latex_path), 'w') as f:
             f.write(results_latex)
             print('Writing LaTeX table to', latex_path)
 
@@ -202,18 +210,20 @@ def process_results(results, groupby='Detector', latex_path=None, fig_path=None,
         nrows = nfigs // 2
         ncols = 2
         fig_i = 1
-        width=9
-        height=3
+        width=10
+        height=4
         fig = plt.figure(figsize=(width*2+1, height*nrows+1))
         fig.set_facecolor('white')
     # change names of detectors according to before_after dictionary
     results.loc[:, 'Detector'] = results.Detector.map(before_after).fillna(results['Detector'])
     for col in results_means.columns:
 
+        # print(f'Processing {col}')
+
         # Figure out if the plot should be reversed or not
         if col==groupby or col in groupby or col=='dataset_name':
             continue
-        if col in ['Precision', 'Recall']:
+        if col in ['Precision', 'F1', 'Recall']:
             reverse=True
         elif col in ['Err-rate', 'Memory', 'Runtime', 'Mean Delay']:
             reverse=False
@@ -238,6 +248,7 @@ def process_results(results, groupby='Detector', latex_path=None, fig_path=None,
 
         # Perform Nemenyi-Friedman test
         nem = sp.posthoc_nemenyi_friedman(data)
+        # print('Post-hocs computed.')
 
         # Put p-values in a form that the cd-diagram code can use
         p_vals = []
@@ -248,7 +259,7 @@ def process_results(results, groupby='Detector', latex_path=None, fig_path=None,
 
         # Set span of CD-diagram and compute average values or average rank
         lowv, highv = None, None
-        if col in ['Precision', 'Recall']: # , 'Err-rate'
+        if col in ['Precision', 'Recall', 'F1']: # , 'Err-rate'
             lowv, highv = 0, 1
             average_vals = results.groupby('Detector').mean()[col]
             if col=='Err-rate':
@@ -256,6 +267,7 @@ def process_results(results, groupby='Detector', latex_path=None, fig_path=None,
         else:
             # Compute average rank
             average_vals = pd.DataFrame(columns=['Detector', col])
+            average_vals[col] = -average_vals[col]
             for dset in results.dataset_name:
                 results_i = results[ results['dataset_name']==dset ]
                 # print(col)
@@ -269,6 +281,7 @@ def process_results(results, groupby='Detector', latex_path=None, fig_path=None,
             # print(average_vals)
             average_vals = average_vals.groupby('Detector').mean()[col]
             # print(average_vals)
+        # print('Average vals computed.')
 
 
         # Put the average values in a form that the cd-diagram code can use
@@ -303,10 +316,12 @@ def process_results(results, groupby='Detector', latex_path=None, fig_path=None,
             'weight': 'normal',
             'size': 22,
         }
-        ax.set_title(col,fontdict=font, y=0.9, x=0.5)
+        ax.set_title(col,fontdict=font, x=0.5, y=0.95) # 0.9
         if not one_fig:
             # fig_path = os.path.abspath(path)+f"-{col.replace(' ', '_')}.pdf"
             plt.savefig(fig_path,bbox_inches='tight')
+
+        # print(f'Completed plot for {col}')
 
     if one_fig:
         # fig_path = os.path.abspath(path)+".pdf"

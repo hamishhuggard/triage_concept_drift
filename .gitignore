@@ -51,6 +51,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+*.zip
 
 # Translations
 *.mo
@@ -141,3 +142,8 @@ cython_debug/
 # static files generated from Django application using `collectstatic`
 media
 static
+
+# My own additions:
+experiments/mimic_results
+experiments/bernoulli_results
+experiments/benchmark_results
