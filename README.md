@@ -4,7 +4,7 @@ A package for detecting concept drift in medical referrals triage.
 
 ## A Primer On Drift
 
-This section has been moved to [primer.ipynb](primer.ipynb) because github doesn't like Latex in READMEs.
+This section has been moved to [primer.ipynb](documentation/primer.ipynb) because github doesn't like Latex in READMEs.
 
 It gives an introduction to the vocabulary used throughout.
 
@@ -43,7 +43,7 @@ Step 4b. If the above didn't work, try this:
 (triage_drift_env)$ pip install .
 ```
 
-Step 5. (Optional) If you want to use this environment in any notebooks, you will need to have `nb_conda_kernels` installed in the base environment. This will be necessary, for example, if you want to run [demo.ipynb](demo.ipynb).
+Step 5. (Optional) If you want to use this environment in any notebooks, you will need to have `nb_conda_kernels` installed in the base environment. This will be necessary, for example, if you want to run [demo.ipynb](documentation/demo.ipynb).
 ```
 (triage_drift_env)$ conda deactivate
 (base)$ conda install nb_conda_kernels
@@ -102,7 +102,7 @@ For each of the registration steps, there is also an optional `description` argu
 ```
 This is added to the hover-text of this data point in the graphical interface.
 
-A detailed illustration of `MultiDriftDetector` usage is given in [demo.ipynb](demo.ipynb).
+A detailed illustration of `MultiDriftDetector` usage is given in [demo.ipynb](documentation/demo.ipynb).
 
 ### Graphic Interface
 
@@ -114,7 +114,7 @@ The app is run as follows, where the argument is the directory that the drift de
 ```
 If you open `http://127.0.0.1:8050/` in a browser, you should see the following screen:
 
-![demo](demo.png)
+![demo](documentation/demo.png)
 
 On the left we have three control panels:
  * __Status__ gives a summary status of the drift detector: whether any of concept drift, feature drift, or label drift have been detected.
