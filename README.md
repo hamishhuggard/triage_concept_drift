@@ -1,10 +1,25 @@
 # Triage Concept Drift
 
-A package for detecting concept drift in medical referrals triage.
+This code is accompanies Hamish Huggard's [M.Sc. research](documentation/thesis.pdf) on concept drift detection for GP referrals triage.
 
-## A Primer On Drift
+## Contents of this Repo
 
-This section has been moved to [primer.ipynb](documentation/primer.ipynb) because github doesn't like Latex in READMEs.
+- [multidriftdetector](multidriftdetector): A package for monitoring a medical triage data stream and alerting the user when concept drift occurs.
+- [driftviewer](driftviewer): A Dash app for visualising the evolution the evolution of the data stream, with summaries of any drifts which have been detected.
+- [tornado_mod](tornado_mod) A clone of the `Tornado` framework, which provides implementations of many concept drift detectors, extended to include some novel drift detectors. These novel detectors are:
+  - [Bayesian Drift Detection Method (BDDM)](tornado_mod/drift_detection/bddm.py)
+  - [Bayes with Adaptive Forgetfulness (BWAF)](tornado_mod/drift_detection/bwaf.py)
+  - [Calibrated Drift Detection Method (CDDM)](tornado_mod/drift_detection/cddm.py)
+- [experiments](experiments): Experiments to validate the novel drift detectors.
+- [Documentation](documentation): Documenation for this research.
+  - [demo.ipynb](documentation/demo.ipynb) A notebook illustrating how to use the `multidriftdetector` package.
+  - [primer.ipynb](documentation/primer.ipynb) A primer on the concept drift and related terminology.
+  - [SIGIR_paper.pdf](documentation/SIGIR_paper.pdf) A paper presented at the SIGIR conference on the novel CDDM detector.
+  - [thesis.pdf](documentation/thesis.pdf) The M.Sc. thesis in which this code was developed.
+
+## Background
+
+For a primer on concept drift and related terminology, see [documentation/primer.ipynb](documentation/primer.ipynb).
 
 It gives an introduction to the vocabulary used throughout.
 
@@ -43,7 +58,7 @@ Step 4b. If the above didn't work, try this:
 (triage_drift_env)$ pip install .
 ```
 
-Step 5. (Optional) If you want to use this environment in any notebooks, you will need to have `nb_conda_kernels` installed in the base environment. This will be necessary, for example, if you want to run [demo.ipynb](documentation/demo.ipynb).
+Step 5. (Optional) If you want to use this environment in any notebooks, you will need to have `nb_conda_kernels` installed in the base environment. This will be necessary, for example, if you want to run [documentation/demo.ipynb](documentation/demo.ipynb).
 ```
 (triage_drift_env)$ conda deactivate
 (base)$ conda install nb_conda_kernels
@@ -102,7 +117,7 @@ For each of the registration steps, there is also an optional `description` argu
 ```
 This is added to the hover-text of this data point in the graphical interface.
 
-A detailed illustration of `MultiDriftDetector` usage is given in [demo.ipynb](documentation/demo.ipynb).
+A detailed illustration of `MultiDriftDetector` usage is given in [documentation/demo.ipynb](documentation/demo.ipynb).
 
 ### Graphic Interface
 
@@ -140,31 +155,13 @@ FeaturePreprocessor:
  * Handling numeric
 
 README:
- * Describe the contents of the repository
  * Talk about the choice of underlying drift detector
 
 Dash app:
  * Don't hard code the contents of the dir. Read it from subdir names.
  * I think this crashes when 100% truncate accuracy.
- * Expand documentation
- * Paginate feature plots
-
-Stretch goals:
-  * Incorporate CDDM
-  * Incorporate Bayes
 
 <!--
-
-## The Contents of this Repo
-
-
-
-### MediTornado
-
-A fork of the Tornado framework with the following additions:
- * An implementation of the CDDM algorithm
- * Data stream generators for medical data based on the MIMIC-III dataset
-Note that this is a git [submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) with its own repository.
 
 ## Conda cheatsheet
 
