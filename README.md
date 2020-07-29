@@ -141,12 +141,15 @@ On the right we have three tabs:
  * __Labels tab__ shows how the rate of each of the labels is evolving over time. Note that these are the labels _as predicted by the model_, not the _gold standard_ labels. Often the gold standard labels arrive later than the predicted labels, so we can get an earlier warning of label drift this way.
  * __Features tab__ shows how the values of each of the features are evolving over time. In the case of free text, it shows how the frequency of different tokens are evolving over time.
 
+
+<!--
+
 ## TODO
 
 MultiDriftDetector:
  * Handle Bonferonni corrections properly
  * Restoring from interrupt
- * Switch from accuracy to precision and recall
+ * Add precision and recall
 
 FeaturePreprocessor:
  * Create it
@@ -161,7 +164,6 @@ Dash app:
  * Don't hard code the contents of the dir. Read it from subdir names.
  * I think this crashes when 100% truncate accuracy.
 
-<!--
 
 ## Conda cheatsheet
 
